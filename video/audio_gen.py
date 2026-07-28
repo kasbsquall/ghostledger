@@ -39,16 +39,15 @@ SCENES = [
      "learning how large."),
 
     ("demo",
-     "Here is an ordinary transfer on a block explorer. The amount is right there, in the "
-     "clear, for anyone. And here is ours. That field holds a thirty two byte handle, and "
-     "the figure is nowhere in the transaction. "
-     "This is what the detector compares against. Four past payouts, every one of them "
-     "encrypted, and the thresholds that separate the three verdicts. "
-     "Publishing the band brings the sealed processor's answer on chain. Within pattern. "
-     "Two signatures out of four, which is exactly what this Safe already required. "
-     "Two owners sign, and it executes. "
-     "Now the same flow with a much larger amount. The verdict comes back anomalous, and "
-     "the payout can no longer move until all four owners sign. Nobody saw either number."),
+     "This is the treasury, live. Ten movements, and not one amount anywhere on the "
+     "screen. Every row shows where the money went and what the verdict was. Where the "
+     "figure should be, there is a lock. "
+     "The green rows moved on two signatures, which is what this Safe already required. "
+     "The red ones cannot move until all four owners sign, and none of them has signed "
+     "yet. Same treasury, same rule, a different number of people needed. "
+     "On the right, the balance as the chain sees it. Thirty two bytes. There is no "
+     "figure to read there, by design. And underneath it the rule that produced every "
+     "verdict, published so that anyone can audit it."),
 
     ("sepolia",
      "Every transaction you just watched is on Ethereum Sepolia. The address is on screen. "

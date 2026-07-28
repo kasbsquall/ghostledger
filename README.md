@@ -154,18 +154,25 @@ npx hardhat compile
 npx hardhat test
 ```
 
-The suite runs against the real Nox stack, not mocks. It asserts, among other
-things, that a public decryption of a confidential amount **fails** while the
-risk band derived from it succeeds.
+The suite runs against the real Nox stack in Docker, not mocks. It asserts,
+among other things, that a public decryption of a confidential amount **fails**
+while the band derived from it succeeds, and that a risk band the enclave never
+signed is refused on chain.
 
 ```
-✔ clears a routine vendor payout and lets it through the Safe
-✔ flags a drain attempt without ever revealing the amount
-✔ keeps a rejected movement out of the baseline
-✔ refuses to execute a movement that was already settled
-✔ asks for review on a payout between the two thresholds
-✔ never says "all clear" before it has any history to judge against
-✔ refuses proposals from an address that is not a Safe owner
+  GhostLedgerModule end to end
+    ✔ routes a routine payout through the Safe on its own threshold
+    ✔ demands every owner before a flagged drain can move
+    ✔ raises the bar by one signature for a movement in the review band
+    ✔ refuses to execute before the band has been settled
+    ✔ never exposes the amount, only the band
+    ✔ keeps a rejected movement out of the baseline
+    ✔ counts each owner once
+    ✔ never says "all clear" before it has any history to judge against
+    ✔ rejects a risk band the enclave did not sign
+    ✔ refuses proposals from an address that is not a Safe owner
+
+10 passing
 ```
 
 ### Deploy to Sepolia

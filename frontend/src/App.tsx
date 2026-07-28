@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPublicClient, createWalletClient, custom, http, isAddress } from 'viem';
+
 import { createViemHandleClient } from '@iexec-nox/handle';
 import {
   ArrowClockwise,
@@ -293,6 +294,8 @@ export default function App() {
           abi: GhostLedgerModuleAbi,
           functionName: 'settle',
           args: [BigInt(movement.id), decryptionProof],
+          account,
+          chain: CHAIN,
         });
       });
     },
@@ -308,6 +311,8 @@ export default function App() {
           abi: GhostLedgerModuleAbi,
           functionName: fn,
           args: [BigInt(movement.id)],
+          account,
+          chain: CHAIN,
         })
       );
     },
@@ -338,7 +343,12 @@ export default function App() {
     () => movements?.filter((m) => m.status === 'Pending') ?? null,
     [movements]
   );
-  const anomalous = useMemo(() => pending?.filter((m) => m.band === 3).length ?? null, [pending]);
+  const anomalous = useMemo(
+    // During an outage `movements` is [], which would render a confident zero
+    // beside a panel saying the endpoint did not answer.
+    () => (loadFailed ? null : (pending?.filter((m) => m.band === 3).length ?? null)),
+    [pending, loadFailed]
+  );
 
   return (
     <div className="shell">
@@ -812,6 +822,7 @@ function ProposeForm({ account, canWrite, busy, onDone, onError, walletFor }: Fo
         abi: GhostLedgerModuleAbi,
         functionName: 'propose',
         args: [handle, handleProof, destination as `0x${string}`],
+        account,
         chain: CHAIN,
       });
       const receipt = await publicClient.waitForTransactionReceipt({ hash });

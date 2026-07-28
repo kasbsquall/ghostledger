@@ -21,8 +21,8 @@ product. It should be featured far more prominently than it currently is.
 **The local Docker test stack in the Hardhat plugin is underrated.** Being able
 to run `hardhat test` and have real encryption, a real TEE runner and real ACL
 enforcement come up in containers changed the pace of the build completely. The
-project's seven integration tests, including one asserting that a public
-decryption of a confidential amount *fails*, all run offline in about eight
+project's ten integration tests, including one asserting that a public
+decryption of a confidential amount *fails*, all run offline in about twelve
 seconds. Please keep this working and document it louder. It is a stronger
 selling point than the wizard.
 

@@ -109,7 +109,7 @@ export const Trust: React.FC = () => {
                     transform: `translateX(${(1 - o) * -8}px)`,
                   }}
                 >
-                  <span style={{color: isHero ? C.flag : C.clear, fontSize: 24}}>✔</span>
+                  <span style={{color: C.clear, fontSize: 24}}>✔</span>
                   <span
                     style={{
                       fontFamily: MONO,

@@ -62,14 +62,14 @@ export const Demo: React.FC = () => {
       extrapolateRight: 'clamp',
       easing: camera,
     });
-  const zoom = drift * punch(70, 120, 1.55) * punch(470, 130, 1.42) * punch(940, 190, 1.5);
+  const zoom = drift * punch(90, 150, 1.5) * punch(450, 160, 1.42) * punch(820, 200, 1.34);
 
-  const originX = interpolate(f, [70, 86, 470, 486, 940, 956], [46, 30, 30, 44, 44, 34], {
+  const originX = interpolate(f, [90, 106, 450, 466, 820, 836], [42, 26, 26, 40, 40, 76], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
     easing: camera,
   });
-  const originY = interpolate(f, [70, 86, 470, 486, 940, 956], [42, 30, 30, 46, 46, 38], {
+  const originY = interpolate(f, [90, 106, 450, 466, 820, 836], [42, 34, 34, 44, 44, 34], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
     easing: camera,
@@ -86,9 +86,10 @@ export const Demo: React.FC = () => {
   return (
     <AbsoluteFill style={{background: C.ink, overflow: 'hidden'}}>
       <Sfx src="whoosh.mp3" at={1} vol={0.24} />
-      <Sfx src="click.mp3" at={70} vol={0.16} />
-      <Sfx src="confirm.mp3" at={470} vol={0.3} />
-      <Sfx src="reject.mp3" at={940} vol={0.4} />
+      <Sfx src="click.mp3" at={90} vol={0.16} />
+      <Sfx src="confirm.mp3" at={450} vol={0.28} />
+      <Sfx src="reject.mp3" at={620} vol={0.34} />
+      <Sfx src="click.mp3" at={820} vol={0.14} />
       <AbsoluteFill
         style={{
           transform: `scale(${zoom}) translateY(${panY}px)`,
@@ -112,14 +113,14 @@ export const Demo: React.FC = () => {
       />
 
       {/* Three annotations, each on the beat the narration names it. */}
-      <Annotation opacity={label(30, 250)} title="The amount is a handle" tone={C.bone}>
-        the figure is nowhere in the transaction
+      <Annotation opacity={label(40, 380)} title="Where the amount should be" tone={C.bone}>
+        a lock, on every row
       </Annotation>
-      <Annotation opacity={label(430, 700)} title="Within pattern" tone={C.clear}>
-        2 of 4 · the Safe&rsquo;s own threshold
+      <Annotation opacity={label(410, 780)} title="Green moved on two. Red needs four." tone={C.clear}>
+        same treasury, same rule, a different number of people
       </Annotation>
-      <Annotation opacity={label(900, 1250)} title="Anomalous" tone={C.flag}>
-        4 of 4 · every owner must sign
+      <Annotation opacity={label(810, 1090)} title="The balance, as the chain sees it" tone={C.bone}>
+        thirty-two bytes · no figure to read
       </Annotation>
     </AbsoluteFill>
   );

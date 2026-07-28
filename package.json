@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts --network sepolia"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Kevin Soto Burgos",
+  "license": "MIT",
+  "description": "A Safe module where the number of signatures a payout needs is derived from the treasury\u2019s own encrypted spending history.",
   "dependencies": {
     "@iexec-nox/handle": "^0.1.0-beta.13",
     "@iexec-nox/nox-confidential-contracts": "^0.2.2",
