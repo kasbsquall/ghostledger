@@ -21,6 +21,7 @@
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
     "@types/node": "^26.1.2",
     "hardhat": "^3.11.1",
+    "playwright": "^1.62.0",
     "typescript": "^7.0.2"
   },
   "type": "module"

@@ -195,6 +195,37 @@ describe('GhostLedgerModule end to end', () => {
     assert.equal(value, BAND_WATCH, 'an empty baseline must fall back to human review');
   });
 
+  it('rejects a risk band the enclave did not sign', async () => {
+    const { handle, handleProof } = await nox.encryptInput(
+      120n * UNIT,
+      'uint256',
+      ghostModule.address
+    );
+    await ghostModule.write.propose([handle, handleProof, vendor]);
+
+    const proposals = await ghostModule.getEvents.MovementProposed();
+    const last = proposals[proposals.length - 1];
+    const id = last.args.id as bigint;
+
+    const { decryptionProof } = await nox.publicDecrypt(last.args.riskHandle as `0x${string}`);
+
+    // The proof is `signature (65 bytes) || decryptedResult`. Flip one nibble of
+    // the result and the gateway's signature no longer covers it, which is the
+    // whole basis for trusting a band nobody can recompute on-chain.
+    const forged = (decryptionProof.slice(0, -1) +
+      (decryptionProof.slice(-1) === '1' ? '2' : '1')) as `0x${string}`;
+
+    await assert.rejects(
+      () => ghostModule.write.settle([id, forged]),
+      'a band the enclave did not sign must not settle'
+    );
+
+    // And the honest proof still works, so the rejection is about the forgery.
+    await ghostModule.write.settle([id, decryptionProof]);
+    const [, , , , band] = await ghostModule.read.movementAt([id]);
+    assert.equal(Number(band), Number(BAND_CLEAR));
+  });
+
   it('refuses proposals from an address that is not a Safe owner', async () => {
     const wallets = await viem.getWalletClients();
     const outsider = wallets[4];
