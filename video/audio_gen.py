@@ -69,7 +69,7 @@ SCENES = [
      "The bigger the payment, the more signatures. And nobody sees the payment."),
 ]
 
-LEAD = 1.6          # seconds of music before the voice enters
+LEAD = 6.8          # seconds of music before the voice enters
 GAP = 0.28          # silence inserted between scenes, so beats do not run together
 
 

@@ -1,7 +1,7 @@
 import {useCurrentFrame} from 'remotion';
 import React from 'react';
 import {C, FONT} from '../theme';
-import {Logo} from './Logo';
+import {Logo, PRODUCT} from './Logo';
 import {SCENES} from '../timing';
 
 // The mark, pinned top-left for the WHOLE film.

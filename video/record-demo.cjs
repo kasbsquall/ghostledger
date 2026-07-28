@@ -22,12 +22,16 @@ const RUN_MS = Number(process.env.RUN_MS ?? 210_000);
 async function main() {
   if (!KEYS) throw new Error('Set CO_SIGNER_KEYS to the co-signer key directory');
 
-  const browser = await chromium.launch({ args: ['--force-device-scale-factor=1'] });
+  // Match the window to the app's own 1240px shell so the capture has no dead
+  // margin to crop later, and record at 2x DPI so a push-in still has real
+  // pixels behind it. The previous take was a 1.9x zoom into a 1080p source,
+  // which is just an upscale wearing a camera move.
+  const browser = await chromium.launch({ args: ['--force-device-scale-factor=2'] });
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 },
-    deviceScaleFactor: 1,
+    viewport: { width: 1312, height: 820 },
+    deviceScaleFactor: 2,
     colorScheme: 'dark',
-    recordVideo: { dir: OUT, size: { width: 1920, height: 1080 } },
+    recordVideo: { dir: OUT, size: { width: 2624, height: 1640 } },
   });
 
   const page = await context.newPage();

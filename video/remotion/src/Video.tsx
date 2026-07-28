@@ -3,49 +3,46 @@ import {SCENES} from './timing';
 import {C} from './theme';
 import {Captions} from './lib/Captions';
 
-// 1. Create one component per scene under src/scenes/ (use the lib primitives).
-// 2. Map each scene id (from scripts/audio_gen.py SCENES) to its component here.
-// Each Series.Sequence uses the scene's durF so its visuals line up with the voiceover.
-//
-// import {Hook} from './scenes/Hook';
-// import {Problem} from './scenes/Problem';
-// ...
+import {ColdOpen} from './scenes/ColdOpen';
+import {Intro} from './scenes/Intro';
+import {Demo} from './scenes/Demo';
+import {Sepolia} from './scenes/Sepolia';
+import {Trust} from './scenes/Trust';
+import {SafeUntouched} from './scenes/SafeUntouched';
+import {Close} from './scenes/Close';
+
 const MAP: Record<string, React.FC> = {
-  // hook: Hook,
-  // problem: Problem,
-  // solution: Solution,
-  // demo: Demo,
-  // proof: Proof,
-  // business: Business,
-  // whatsnext: WhatsNext,
-  // close: Close,
+  intro: Intro,
+  demo: Demo,
+  sepolia: Sepolia,
+  trust: Trust,
+  safe: SafeUntouched,
+  close: Close,
 };
 
-const Placeholder: React.FC<{id: string}> = ({id}) => (
-  <AbsoluteFill style={{background: C.navy, alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 60}}>
-    {id}
+/**
+ * The voiceover starts at 6.8s, so the frames before it belong to the cold
+ * open. That gap is derived from the audio rather than declared, which means a
+ * re-record moves the open with it instead of desyncing everything after it.
+ */
+const OPEN_FRAMES = SCENES[0].startF;
+
+export const Video: React.FC = () => (
+  <AbsoluteFill style={{background: C.ink}}>
+    <Series>
+      <Series.Sequence durationInFrames={OPEN_FRAMES}>
+        <ColdOpen />
+      </Series.Sequence>
+      {SCENES.map((s) => {
+        const Comp = MAP[s.id];
+        return (
+          <Series.Sequence key={s.id} durationInFrames={s.durF}>
+            {Comp ? <Comp /> : <AbsoluteFill style={{background: C.ink}} />}
+          </Series.Sequence>
+        );
+      })}
+    </Series>
+    <Audio src={staticFile('final_audio.wav')} />
+    <Captions />
   </AbsoluteFill>
 );
-
-export const Video: React.FC = () => {
-  return (
-    <AbsoluteFill style={{background: C.ink}}>
-      <Series>
-        {SCENES.map((s) => {
-          const Comp = MAP[s.id];
-          return (
-            <Series.Sequence key={s.id} durationInFrames={s.durF}>
-              {Comp ? <Comp /> : <Placeholder id={s.id} />}
-            </Series.Sequence>
-          );
-        })}
-      </Series>
-      {/* WAV, not MP3, and that is deliberate: the audio chain stays PCM end to end so the
-          only lossy step in the whole film is the final encode. `audio_gen.py` writes
-          `final_audio.wav`; these two names are the single wire between the audio half of
-          the pipeline and the video half, and they were mismatched for a whole release. */}
-      <Audio src={staticFile('final_audio.wav')} />
-      <Captions />
-    </AbsoluteFill>
-  );
-};

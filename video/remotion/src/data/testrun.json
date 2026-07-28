@@ -1,0 +1,16 @@
+{
+  "suite": "GhostLedgerModule end to end",
+  "lines": [
+    ["routes a routine payout through the Safe on its own threshold", "2408ms"],
+    ["demands every owner before a flagged drain can move", "1395ms"],
+    ["raises the bar by one signature for a movement in the review band", "823ms"],
+    ["refuses to execute before the band has been settled", "321ms"],
+    ["never exposes the amount, only the band", "1338ms"],
+    ["keeps a rejected movement out of the baseline", "1872ms"],
+    ["counts each owner once", "1223ms"],
+    ["never says \"all clear\" before it has any history to judge against", "1162ms"],
+    ["rejects a risk band the enclave did not sign", "1059ms"],
+    ["refuses proposals from an address that is not a Safe owner", "263ms"]
+  ],
+  "total": "10 passing"
+}

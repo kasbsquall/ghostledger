@@ -52,7 +52,13 @@ type Movement = {
   revealed: bigint | null;
 };
 
-const publicClient = createPublicClient({ chain: CHAIN, transport: http() });
+// An explicit endpoint, because viem's default for Sepolia rate-limits under a
+// 15s poll and the dashboard then shows an error state that is about the RPC
+// rather than about the treasury.
+const publicClient = createPublicClient({
+  chain: CHAIN,
+  transport: http('https://ethereum-sepolia-rpc.publicnode.com', { retryCount: 3 }),
+});
 
 const SAFE_ABI = [
   {

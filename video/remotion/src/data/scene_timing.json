@@ -1,45 +1,45 @@
 {
-  "vo": 112.087,
+  "vo": 117.287,
   "scenes": [
     {
       "id": "intro",
-      "start": 1.6,
-      "end": 28.071,
+      "start": 6.8,
+      "end": 33.271,
       "dur": 26.471,
       "words": 87
     },
     {
       "id": "demo",
-      "start": 28.351,
-      "end": 70.75,
+      "start": 33.551,
+      "end": 75.95,
       "dur": 42.4,
       "words": 123
     },
     {
       "id": "sepolia",
-      "start": 71.03,
-      "end": 77.578,
+      "start": 76.23,
+      "end": 82.778,
       "dur": 6.548,
       "words": 19
     },
     {
       "id": "trust",
-      "start": 77.858,
-      "end": 95.506,
+      "start": 83.058,
+      "end": 100.706,
       "dur": 17.647,
       "words": 54
     },
     {
       "id": "safe",
-      "start": 95.786,
-      "end": 106.885,
+      "start": 100.986,
+      "end": 112.085,
       "dur": 11.099,
       "words": 31
     },
     {
       "id": "close",
-      "start": 107.165,
-      "end": 112.087,
+      "start": 112.365,
+      "end": 117.287,
       "dur": 4.923,
       "words": 12
     }
