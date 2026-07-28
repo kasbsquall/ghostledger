@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPublicClient, createWalletClient, custom, http, isAddress } from 'viem';
 import { createViemHandleClient } from '@iexec-nox/handle';
 import {
+  ArrowClockwise,
   ArrowUpRight,
   Cube,
   FileDashed,
@@ -53,23 +54,39 @@ type Movement = {
 
 const publicClient = createPublicClient({ chain: CHAIN, transport: http() });
 
+const SAFE_ABI = [
+  {
+    inputs: [{ name: 'owner', type: 'address' }],
+    name: 'isOwner',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
+
 export default function App() {
   const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [movements, setMovements] = useState<Movement[] | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [treasuryHandle, setTreasuryHandle] = useState<`0x${string}` | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [revealing, setRevealing] = useState<number | null>(null);
+  const [, forceTick] = useState(0);
 
   const handleClient = useRef<Awaited<ReturnType<typeof createViemHandleClient>> | null>(null);
   const loadToken = useRef(0);
 
-  const walletFor = useCallback((address: `0x${string}`) => {
-    return createWalletClient({
-      account: address,
-      chain: CHAIN,
-      transport: custom((window as { ethereum?: unknown }).ethereum as never),
-    });
-  }, []);
+  const walletFor = useCallback(
+    (address: `0x${string}`) =>
+      createWalletClient({
+        account: address,
+        chain: CHAIN,
+        transport: custom((window as { ethereum?: unknown }).ethereum as never),
+      }),
+    []
+  );
 
   const connect = useCallback(async () => {
     const ethereum = (window as { ethereum?: unknown }).ethereum;
@@ -80,14 +97,38 @@ export default function App() {
     try {
       const probe = createWalletClient({ chain: CHAIN, transport: custom(ethereum as never) });
       const [address] = await probe.requestAddresses();
-      await probe.switchChain({ id: CHAIN.id }).catch(() => undefined);
+      await probe.switchChain({ id: CHAIN.id });
       handleClient.current = await createViemHandleClient(walletFor(address));
       setAccount(address);
       setError(null);
     } catch (cause) {
-      setError(readableError(cause, 'Could not connect your wallet.'));
+      setError(readableError(cause, 'Could not connect to Sepolia with this wallet.'));
     }
   }, [walletFor]);
+
+  // A wallet can change account or network underneath us. Drop everything
+  // derived from the old one rather than acting on stale authority.
+  useEffect(() => {
+    const ethereum = (window as { ethereum?: { on?: Function; removeListener?: Function } }).ethereum;
+    if (!ethereum?.on) return;
+    const reset = () => {
+      handleClient.current = null;
+      setAccount(null);
+      setIsOwner(false);
+    };
+    ethereum.on('accountsChanged', reset);
+    ethereum.on('chainChanged', reset);
+    return () => {
+      ethereum.removeListener?.('accountsChanged', reset);
+      ethereum.removeListener?.('chainChanged', reset);
+    };
+  }, []);
+
+  /** Relative timestamps go stale silently, so nudge the tree every 30s. */
+  useEffect(() => {
+    const id = setInterval(() => forceTick((n) => n + 1), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   /**
    * Everything on this screen comes from contract storage. The band is read,
@@ -149,7 +190,14 @@ export default function App() {
       );
 
       if (run !== loadToken.current) return;
-      setMovements([...rows].reverse());
+
+      // Amounts a signer already revealed must survive a refresh, otherwise
+      // every transaction silently re-hides work the user did.
+      setMovements((previous) => {
+        const revealed = new Map(previous?.map((m) => [m.id, m.revealed]));
+        return rows.map((row) => ({ ...row, revealed: revealed.get(row.id) ?? null })).reverse();
+      });
+      setLoadFailed(false);
 
       const balance = await publicClient.readContract({
         address: ADDRESSES.token,
@@ -161,6 +209,8 @@ export default function App() {
       setTreasuryHandle(balance);
     } catch (cause) {
       if (run !== loadToken.current) return;
+      setLoadFailed(true);
+      setMovements([]);
       setError(readableError(cause, 'Cannot reach the treasury module right now.'));
     }
   }, [account]);
@@ -172,29 +222,52 @@ export default function App() {
     };
   }, [load]);
 
+  /** Another owner signing must show up without this user doing anything. */
+  useEffect(() => {
+    const id = setInterval(() => void load(), 15_000);
+    return () => clearInterval(id);
+  }, [load]);
+
+  useEffect(() => {
+    if (!account) return;
+    publicClient
+      .readContract({
+        address: ADDRESSES.safe,
+        abi: SAFE_ABI,
+        functionName: 'isOwner',
+        args: [account],
+      })
+      .then(setIsOwner)
+      .catch(() => setIsOwner(false));
+  }, [account]);
+
   const send = useCallback(
     async (label: string, write: () => Promise<`0x${string}`>) => {
       setBusy(label);
       setError(null);
       try {
         const hash = await write();
-        await publicClient.waitForTransactionReceipt({ hash });
-        await load();
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        // A receipt resolves for reverted transactions too. Without this check
+        // a failure would look exactly like a success.
+        if (receipt.status === 'reverted') {
+          throw new Error('The transaction was mined but reverted.');
+        }
       } catch (cause) {
         setError(readableError(cause, 'The transaction did not go through.'));
       } finally {
         setBusy(null);
+        await load();
       }
     },
     [load]
   );
 
-  /** Fetches the gateway proof for a band and hands it to the contract. */
-  const settle = useCallback(
+  const publishBand = useCallback(
     (movement: Movement) => {
       const client = handleClient.current;
       if (!account || !client) return;
-      return send(`settle-${movement.id}`, async () => {
+      return send(`publish-${movement.id}`, async () => {
         const { decryptionProof } = await client.publicDecrypt(movement.riskHandle);
         return walletFor(account).writeContract({
           address: ADDRESSES.module,
@@ -222,35 +295,31 @@ export default function App() {
     [account, send, walletFor]
   );
 
-  const reveal = useCallback(
-    async (movement: Movement) => {
-      const client = handleClient.current;
-      if (!client) return;
-      const run = loadToken.current;
-      setBusy(`reveal-${movement.id}`);
-      try {
-        const { value } = await client.decrypt(movement.amountHandle);
-        if (run !== loadToken.current) return;
-        setMovements((current) =>
-          current?.map((m) => (m.id === movement.id ? { ...m, revealed: BigInt(value) } : m)) ?? null
-        );
-      } catch {
-        setError('This account is not on the access list for that amount.');
-      } finally {
-        setBusy(null);
-      }
-    },
-    []
-  );
+  const reveal = useCallback(async (movement: Movement) => {
+    const client = handleClient.current;
+    if (!client) return;
+    const run = loadToken.current;
+    setRevealing(movement.id);
+    try {
+      const { value } = await client.decrypt(movement.amountHandle);
+      if (run !== loadToken.current) return;
+      setMovements((current) =>
+        current?.map((m) => (m.id === movement.id ? { ...m, revealed: BigInt(value) } : m)) ?? null
+      );
+    } catch (cause) {
+      setError(
+        readableError(cause, 'This account is not on the access list for that amount.')
+      );
+    } finally {
+      setRevealing(null);
+    }
+  }, []);
 
   const pending = useMemo(
     () => movements?.filter((m) => m.status === 'Pending') ?? null,
     [movements]
   );
-  const anomalous = useMemo(
-    () => pending?.filter((m) => m.band === 3).length ?? null,
-    [pending]
-  );
+  const anomalous = useMemo(() => pending?.filter((m) => m.band === 3).length ?? null, [pending]);
 
   return (
     <div className="shell">
@@ -258,9 +327,9 @@ export default function App() {
         <div className="brand">
           <Mark size={26} animate />
           <div className="brand__text">
-            <span className="brand__name">
+            <h1 className="brand__name">
               Ghost<span className="brand__name-dim">Ledger</span>
-            </span>
+            </h1>
             <span className="brand__line">
               How many signatures a payout needs, decided by data nobody can read
             </span>
@@ -281,8 +350,10 @@ export default function App() {
             <ArrowUpRight size={11} weight="light" />
           </a>
           {account ? (
-            <span className="chip mono chip--live">
-              <Wallet size={12} weight="light" /> {short(account)}
+            <span className={`chip mono ${isOwner ? 'chip--live' : 'chip--warn'}`}>
+              <Wallet size={12} weight="light" />
+              {short(account)}
+              {!isOwner && ' · not a signer'}
             </span>
           ) : (
             <button type="button" className="btn btn--primary" onClick={connect}>
@@ -305,18 +376,34 @@ export default function App() {
       <main className="grid">
         <section className="col-main rise" style={{ '--i': 1 } as React.CSSProperties}>
           <div className="section-head">
-            <h2>Movements</h2>
+            <div>
+              <h2>Movements</h2>
+              <p className="section-head__lede">
+                Publish the risk band, collect the signatures it demands, execute through the Safe.
+              </p>
+            </div>
             {pending !== null && movements!.length > 0 && (
               <span className="section-head__note mono">
                 {pending.length} pending of {movements!.length} total
               </span>
             )}
           </div>
+
+          {!account && (
+            <p className="inline-note">
+              Read-only. Connect a wallet that signs on this Safe to publish bands, sign or execute.
+            </p>
+          )}
+
           <MovementsTable
             movements={movements}
-            account={account}
+            loadFailed={loadFailed}
+            canWrite={Boolean(account) && isOwner}
+            canReveal={Boolean(account)}
             busy={busy}
-            onSettle={settle}
+            revealing={revealing}
+            onRetry={load}
+            onPublish={publishBand}
             onApprove={(m) => act(m, 'approve')}
             onExecute={(m) => act(m, 'execute')}
             onReject={(m) => act(m, 'reject')}
@@ -327,13 +414,38 @@ export default function App() {
         <aside className="col-side">
           <BalancePanel handle={treasuryHandle} anomalous={anomalous} />
           <PolicyPanel />
-          <ProposeForm account={account} busy={busy} onDone={load} onError={setError} walletFor={walletFor} />
+          <ProposeForm
+            account={account}
+            canWrite={Boolean(account) && isOwner}
+            busy={busy}
+            onDone={load}
+            onError={setError}
+            walletFor={walletFor}
+          />
         </aside>
       </main>
 
       <footer className="footer mono">
-        module {short(ADDRESSES.module)} · log {short(ADDRESSES.log)} · token{' '}
-        {short(ADDRESSES.token)}
+        {(
+          [
+            ['module', ADDRESSES.module],
+            ['log', ADDRESSES.log],
+            ['token', ADDRESSES.token],
+          ] as const
+        ).map(([label, address], index) => (
+          <span key={label}>
+            {index > 0 && ' · '}
+            {label}{' '}
+            <a
+              className="link"
+              href={`${EXPLORER}/address/${address}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {short(address)}
+            </a>
+          </span>
+        ))}
       </footer>
     </div>
   );
@@ -341,31 +453,39 @@ export default function App() {
 
 type TableProps = {
   movements: Movement[] | null;
-  account: `0x${string}` | null;
+  loadFailed: boolean;
+  canWrite: boolean;
+  canReveal: boolean;
   busy: string | null;
-  onSettle: (movement: Movement) => void;
+  revealing: number | null;
+  onRetry: () => void;
+  onPublish: (movement: Movement) => void;
   onApprove: (movement: Movement) => void;
   onExecute: (movement: Movement) => void;
   onReject: (movement: Movement) => void;
   onReveal: (movement: Movement) => void;
 };
 
-function MovementsTable({
-  movements,
-  account,
-  busy,
-  onSettle,
-  onApprove,
-  onExecute,
-  onReject,
-  onReveal,
-}: TableProps) {
+function MovementsTable({ movements, loadFailed, onRetry, ...row }: TableProps) {
   if (movements === null) {
     return (
-      <div className="table-frame">
-        {[0, 1, 2].map((row) => (
-          <div className="skeleton-row" key={row} style={{ '--i': row } as React.CSSProperties} />
+      <div className="table-frame" role="status" aria-label="Loading movements">
+        {[0, 1, 2].map((line) => (
+          <div className="skeleton-row" key={line} style={{ '--i': line } as React.CSSProperties} />
         ))}
+      </div>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="table-frame empty">
+        <WarningOctagon size={26} weight="light" />
+        <p>Could not read the movements.</p>
+        <span>The Sepolia endpoint did not answer.</span>
+        <button type="button" className="btn btn--solid" onClick={onRetry}>
+          <ArrowClockwise size={13} weight="light" /> Try again
+        </button>
       </div>
     );
   }
@@ -381,14 +501,14 @@ function MovementsTable({
   }
 
   return (
-    <div className="table-frame">
+    <div className="table-frame" tabIndex={0} role="region" aria-label="Treasury movements">
       <table className="movements">
         <thead>
           <tr>
             <th className="c-id">ID</th>
             <th>Destination</th>
             <th>Amount</th>
-            <th>Risk</th>
+            <th>Risk band</th>
             <th>Signatures</th>
             <th className="c-time">Proposed</th>
             <th className="c-act" aria-label="Actions" />
@@ -396,18 +516,7 @@ function MovementsTable({
         </thead>
         <tbody>
           {movements.map((movement, index) => (
-            <MovementRow
-              key={movement.id}
-              movement={movement}
-              index={index}
-              account={account}
-              busy={busy}
-              onSettle={onSettle}
-              onApprove={onApprove}
-              onExecute={onExecute}
-              onReject={onReject}
-              onReveal={onReveal}
-            />
+            <MovementRow key={movement.id} movement={movement} index={index} {...row} />
           ))}
         </tbody>
       </table>
@@ -415,31 +524,39 @@ function MovementsTable({
   );
 }
 
-type RowProps = Omit<TableProps, 'movements'> & { movement: Movement; index: number };
+type RowProps = Omit<TableProps, 'movements' | 'loadFailed' | 'onRetry'> & {
+  movement: Movement;
+  index: number;
+};
 
 function MovementRow({
   movement,
   index,
-  account,
+  canWrite,
+  canReveal,
   busy,
-  onSettle,
+  revealing,
+  onPublish,
   onApprove,
   onExecute,
   onReject,
   onReveal,
 }: RowProps) {
+  const [confirmReject, setConfirmReject] = useState(false);
+
   const isPending = movement.status === 'Pending';
-  const isSettled = movement.band !== 0;
+  const isPublished = movement.band !== 0;
   const hasQuorum = movement.approvals >= movement.required;
-  const label = (fn: string) => busy === `${fn}-${movement.id}`;
-  const locked = busy !== null || !account;
+  const running = (fn: string) => busy === `${fn}-${movement.id}`;
+  const locked = busy !== null || !canWrite;
+  const missing = movement.required - movement.approvals;
 
   return (
     <tr
-      className={`rise-row ${isPending ? '' : 'settled'}`}
+      className={`rise-row ${isPending ? '' : `settled settled--${movement.status.toLowerCase()}`}`}
       style={{ '--i': Math.min(index, 7) } as React.CSSProperties}
     >
-      <td className="c-id mono">{String(movement.id + 1).padStart(2, '0')}</td>
+      <td className="c-id mono">{String(movement.id).padStart(2, '0')}</td>
 
       <td>
         <a
@@ -458,10 +575,11 @@ function MovementRow({
             type="button"
             className="btn btn--ghost btn--tiny"
             onClick={() => onReveal(movement)}
-            disabled={locked}
+            disabled={!canReveal || revealing !== null}
+            aria-label={`Reveal the amount of movement ${movement.id}`}
           >
             <Lock size={12} weight="light" />
-            {label('reveal') ? 'Decrypting' : 'Encrypted'}
+            {revealing === movement.id ? 'Decrypting' : 'Reveal amount'}
           </button>
         ) : (
           <span className="num revealed">
@@ -475,61 +593,74 @@ function MovementRow({
       </td>
 
       <td className="c-sigs">
-        {isSettled ? (
+        {isPublished ? (
           <span className={`sigs num ${hasQuorum ? 'is-met' : ''}`}>
             {movement.approvals} / {movement.required}
           </span>
         ) : (
-          <span className="sigs sigs--unknown mono">not set</span>
+          <span className="sigs sigs--unknown mono">after band</span>
         )}
       </td>
 
-      <td className="c-time mono">{sinceNow(movement.proposedAt)}</td>
+      <td className="c-time mono">
+        <time dateTime={new Date(movement.proposedAt * 1000).toISOString()}>
+          {sinceNow(movement.proposedAt)}
+        </time>
+      </td>
 
       <td className="c-act">
         {!isPending ? (
           <span className="status mono">{movement.status}</span>
-        ) : !isSettled ? (
+        ) : !isPublished ? (
           <button
             type="button"
             className="btn btn--solid btn--tiny"
-            onClick={() => onSettle(movement)}
+            onClick={() => onPublish(movement)}
             disabled={locked}
+            aria-label={`Publish the risk band of movement ${movement.id}`}
           >
             <SealCheck size={12} weight="light" />
-            {label('settle') ? 'Settling' : 'Settle band'}
+            {running('publish') ? 'Publishing' : 'Publish band'}
           </button>
         ) : (
           <div className="row-actions">
             <button
               type="button"
-              className="btn btn--ghost btn--tiny"
-              onClick={() => onReject(movement)}
+              className={`btn btn--tiny ${confirmReject ? 'btn--danger' : 'btn--ghost'}`}
+              onClick={() => (confirmReject ? onReject(movement) : setConfirmReject(true))}
+              onBlur={() => setConfirmReject(false)}
               disabled={locked}
+              aria-label={`Reject movement ${movement.id}`}
             >
               <Prohibit size={12} weight="light" />
-              {label('reject') ? 'Rejecting' : 'Reject'}
+              {running('reject') ? 'Rejecting' : confirmReject ? 'Confirm reject' : 'Reject'}
             </button>
+
             {hasQuorum ? (
               <button
                 type="button"
                 className="btn btn--solid btn--tiny"
                 onClick={() => onExecute(movement)}
                 disabled={locked}
+                aria-label={`Execute movement ${movement.id}`}
               >
                 <PaperPlaneTilt size={12} weight="light" />
-                {label('execute') ? 'Executing' : 'Execute'}
+                {running('execute') ? 'Executing' : 'Execute'}
               </button>
+            ) : movement.signedByMe ? (
+              <span className="waiting mono">
+                signed · {missing} more {missing === 1 ? 'signer' : 'signers'}
+              </span>
             ) : (
               <button
                 type="button"
                 className="btn btn--solid btn--tiny"
                 onClick={() => onApprove(movement)}
-                disabled={locked || movement.signedByMe}
-                title={movement.signedByMe ? 'You have already signed this movement' : undefined}
+                disabled={locked}
+                aria-label={`Sign movement ${movement.id}`}
               >
                 <Signature size={12} weight="light" />
-                {label('approve') ? 'Signing' : movement.signedByMe ? 'Signed' : 'Sign'}
+                {running('approve') ? 'Signing' : 'Sign'}
               </button>
             )}
           </div>
@@ -548,8 +679,20 @@ function BalancePanel({
 }) {
   return (
     <div className="panel rise" style={{ '--i': 2 } as React.CSSProperties}>
+      <div className="panel__stat panel__stat--lead">
+        <span className="panel__stat-label">Anomalous and pending</span>
+        {anomalous === null ? (
+          <span className="skeleton-inline" />
+        ) : (
+          <span className={`headline num ${anomalous > 0 ? 'is-flag' : ''}`}>
+            {anomalous}
+            <em>{anomalous === 1 ? 'movement' : 'movements'}</em>
+          </span>
+        )}
+      </div>
+
       <span className="panel__label">
-        <Vault size={12} weight="light" /> Balance handle
+        <Vault size={12} weight="light" /> Treasury balance, as the chain sees it
       </span>
 
       {handle === null ? (
@@ -558,22 +701,11 @@ function BalancePanel({
         <>
           <div className="handle mono">{handle}</div>
           <p className="panel__note">
-            This is everything the chain reveals about the treasury. Thirty-two bytes pointing at an
-            encrypted value only the Safe can resolve.
+            Thirty-two bytes pointing at an encrypted value only the Safe can resolve. There is no
+            figure to read here, by design.
           </p>
         </>
       )}
-
-      <div className="panel__stat">
-        <span className="panel__stat-label">Anomalous and pending</span>
-        {anomalous === null ? (
-          <span className="skeleton-inline" />
-        ) : (
-          <span className={`panel__stat-value num ${anomalous > 0 ? 'is-flag' : ''}`}>
-            {anomalous} <em>{anomalous === 1 ? 'movement' : 'movements'}</em>
-          </span>
-        )}
-      </div>
     </div>
   );
 }
@@ -582,34 +714,36 @@ function PolicyPanel() {
   return (
     <div className="panel rise" style={{ '--i': 3 } as React.CSSProperties}>
       <span className="panel__label">
-        <Scales size={12} weight="light" /> Scoring policy
+        <Scales size={12} weight="light" /> Risk band policy
       </span>
       <p className="panel__note">
-        Each movement is compared against the treasury's own trailing average payout. The rule below
+        Every movement is compared against the treasury's own trailing average payout. The rule below
         is public so it can be audited. The figures it runs on never are.
       </p>
       <ul className="policy">
         <li>
           <i className="dot dot--idle" />
-          <span>Not settled</span>
+          <span>Not published</span>
           <b className="num">band not yet on-chain</b>
         </li>
         <li>
           <i className="dot dot--clear" />
           <span>Within pattern</span>
-          <b className="num">under {POLICY.watchFactor}× average</b>
+          <b className="num">
+            under {POLICY.watchFactor}× avg · threshold
+          </b>
         </li>
         <li>
           <i className="dot dot--watch" />
           <span>Review</span>
           <b className="num">
-            {POLICY.watchFactor}× to {POLICY.flagFactor}× average
+            {POLICY.watchFactor}–{POLICY.flagFactor}× avg · threshold + 1
           </b>
         </li>
         <li>
           <i className="dot dot--flag" />
           <span>Anomalous</span>
-          <b className="num">over {POLICY.flagFactor}× average</b>
+          <b className="num">over {POLICY.flagFactor}× avg · every owner</b>
         </li>
       </ul>
       <p className="panel__note panel__note--tight">
@@ -622,20 +756,24 @@ function PolicyPanel() {
 
 type FormProps = {
   account: `0x${string}` | null;
+  canWrite: boolean;
   busy: string | null;
   onDone: () => void;
   onError: (message: string | null) => void;
   walletFor: (address: `0x${string}`) => ReturnType<typeof createWalletClient>;
 };
 
-function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
+function ProposeForm({ account, canWrite, busy, onDone, onError, walletFor }: FormProps) {
   const [amount, setAmount] = useState('');
   const [destination, setDestination] = useState('');
   const [isSending, setIsSending] = useState(false);
 
+  const parsed = Number(amount);
+  const amountTouched = amount !== '';
+  const amountValid = Number.isFinite(parsed) && parsed >= 0.01;
   const destinationTouched = destination !== '';
   const destinationValid = isAddress(destination);
-  const canSubmit = Number(amount) > 0 && destinationValid;
+  const canSubmit = amountValid && destinationValid && canWrite;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -647,7 +785,7 @@ function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
       const wallet = walletFor(account);
       const client = await createViemHandleClient(wallet);
 
-      const raw = BigInt(Math.round(Number(amount) * 10 ** DECIMALS));
+      const raw = BigInt(Math.round(parsed * 10 ** DECIMALS));
       const { handle, handleProof } = await client.encryptInput(raw, 'uint256', ADDRESSES.module);
 
       const hash = await wallet.writeContract({
@@ -657,15 +795,16 @@ function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
         args: [handle, handleProof, destination as `0x${string}`],
         chain: CHAIN,
       });
-      await publicClient.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      if (receipt.status === 'reverted') throw new Error('The proposal reverted.');
 
       setAmount('');
       setDestination('');
-      onDone();
     } catch (cause) {
       onError(readableError(cause, 'Could not submit the movement.'));
     } finally {
       setIsSending(false);
+      onDone();
     }
   }
 
@@ -681,30 +820,41 @@ function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
 
       <label className="field">
         <span>Amount</span>
-        <div className="field__input">
+        <div className={`field__input ${amountTouched && !amountValid ? 'is-invalid' : ''}`}>
           <input
             className="num"
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
+            aria-invalid={amountTouched && !amountValid}
+            aria-describedby="amount-hint"
             onChange={(event) => setAmount(event.target.value)}
           />
           <em className="mono">TUSD</em>
         </div>
+        {amountTouched && !amountValid && (
+          <span id="amount-hint" className="field__hint field__hint--error">
+            Enter a number of at least 0.01 TUSD.
+          </span>
+        )}
       </label>
 
       <label className="field">
         <span>Destination</span>
-        <div className={`field__input ${destinationTouched && !destinationValid ? 'is-invalid' : ''}`}>
+        <div
+          className={`field__input ${destinationTouched && !destinationValid ? 'is-invalid' : ''}`}
+        >
           <input
             className="mono"
             placeholder="0x…"
             value={destination}
+            aria-invalid={destinationTouched && !destinationValid}
+            aria-describedby="destination-hint"
             onChange={(event) => setDestination(event.target.value)}
           />
         </div>
         {destinationTouched && !destinationValid && (
-          <span className="field__hint field__hint--error">
+          <span id="destination-hint" className="field__hint field__hint--error">
             That is not a valid Ethereum address.
           </span>
         )}
@@ -713,7 +863,7 @@ function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
       <button
         type="submit"
         className="btn btn--primary btn--full"
-        disabled={!account || !canSubmit || isSending || busy !== null}
+        disabled={!canSubmit || isSending || busy !== null}
       >
         {isSending ? 'Encrypting and signing' : 'Encrypt and propose'}
         <span className="btn__icon">
@@ -722,8 +872,11 @@ function ProposeForm({ account, busy, onDone, onError, walletFor }: FormProps) {
       </button>
 
       {!account && (
+        <span className="field__hint">Connect a wallet to propose a movement.</span>
+      )}
+      {account && !canWrite && (
         <span className="field__hint">
-          Connect a wallet that signs on this Safe to propose or sign movements.
+          This address is not a signer on the Safe, so it cannot propose.
         </span>
       )}
     </form>

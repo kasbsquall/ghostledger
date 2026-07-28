@@ -20,13 +20,13 @@
   --bone: #e8eae7;
   --bone-lift: #f3f5f2;
   --dim: #99a3ab;
-  --mute: #6b757d;
-  --faint: #454e55;
+  --mute: #8b959d;
+  --faint: #6f7b85;
 
   /* the only chroma in the product */
   --clear: #4d9a72;
   --watch: #b8893c;
-  --flag: #b8524a;
+  --flag: #d4726a;
   --clear-wash: rgba(77, 154, 114, 0.12);
   --watch-wash: rgba(184, 137, 60, 0.12);
   --flag-wash: rgba(184, 82, 74, 0.13);

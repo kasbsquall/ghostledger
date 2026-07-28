@@ -382,21 +382,8 @@
   background: var(--flag-wash);
 }
 
-.badge--pending {
-  color: var(--faint);
-  background: transparent;
-  border: 1px dashed var(--hair-strong);
-}
 
-.spin {
-  animation: spin 900ms linear infinite;
-}
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 /* ---------- panels ---------- */
 
@@ -708,3 +695,83 @@
 .col-side > .panel:nth-child(2) {
   margin-bottom: var(--s-5);
 }
+
+/* ---------- second pass: clarity fixes ---------- */
+
+.section-head { align-items: flex-start; }
+
+.section-head__lede {
+  margin: 5px 0 0;
+  font-size: var(--t-small);
+  color: var(--dim);
+  max-width: 46ch;
+}
+
+.inline-note {
+  margin: 0 0 var(--s-3);
+  font-size: var(--t-small);
+  color: var(--mute);
+}
+
+.chip--warn {
+  color: var(--watch);
+  border-color: rgba(184, 137, 60, 0.4);
+}
+
+.btn--danger {
+  color: var(--flag);
+  border-color: rgba(212, 114, 106, 0.45);
+  background: var(--flag-wash);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: rgba(212, 114, 106, 0.2);
+  border-color: rgba(212, 114, 106, 0.6);
+  color: var(--flag);
+}
+
+.waiting {
+  font-size: var(--t-micro);
+  color: var(--mute);
+  letter-spacing: 0.03em;
+}
+
+/* The one place with a real hierarchy jump: 44px against a 9.5px label. */
+.panel__stat--lead {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-1);
+  padding-top: 0;
+  border-top: 0;
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--hair);
+  margin-bottom: var(--s-2);
+}
+
+.headline {
+  font-size: 44px;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  color: var(--bone);
+}
+
+.headline.is-flag { color: var(--flag); }
+
+.headline em {
+  font-style: normal;
+  font-size: var(--t-micro);
+  color: var(--mute);
+  margin-left: 7px;
+  letter-spacing: 0.02em;
+}
+
+.settled--rejected .status { color: var(--flag); }
+
+.movements tbody tr:focus-within { background: var(--slate); }
+
+.table-frame:focus-visible {
+  outline: 1px solid var(--bone);
+  outline-offset: -1px;
+}
+
+.empty .btn { margin-top: var(--s-3); }
