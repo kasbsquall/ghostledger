@@ -49,6 +49,21 @@ async function main() {
   );
   const handleClient = await createViemHandleClient(wallets[0]);
 
+  /** Polls until the Runner has published the band, or gives up loudly. */
+  async function waitForBand(handle: `0x${string}`, attempts = 20) {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        return await handleClient.publicDecrypt(handle);
+      } catch (cause) {
+        const message = String((cause as Error)?.message ?? cause);
+        if (!/not publicly decryptable|access_denied/.test(message)) throw cause;
+        process.stdout.write(`  waiting for the enclave (${i + 1}/${attempts})\r`);
+        await new Promise((resolve) => setTimeout(resolve, 3_000));
+      }
+    }
+    throw new Error('the band never became publicly decryptable');
+  }
+
   const send = async (label: string, hash: `0x${string}`) => {
     const receipt = await pub.waitForTransactionReceipt({ hash });
     console.log(`  ${label.padEnd(26)} ${receipt.status}`);
@@ -73,9 +88,10 @@ async function main() {
     const id = (await ghostModule.read.movementCount()) - 1n;
     const [, , , , , , riskHandle] = await ghostModule.read.movementAt([id]);
 
-    const { value, decryptionProof } = await handleClient.publicDecrypt(
-      riskHandle as `0x${string}`
-    );
+    // `allowPublicDecryption` is a request, not an effect: the contract emits
+    // it and the Runner marks the handle afterwards, off-chain. Asking too
+    // early gets a 403 from the gateway, so wait for the enclave to catch up.
+    const { value, decryptionProof } = await waitForBand(riskHandle as `0x${string}`);
     await send(
       'settle band on-chain',
       await ghostModule.write.settle([id, decryptionProof], { account: wallets[0].account })

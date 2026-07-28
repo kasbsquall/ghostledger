@@ -268,7 +268,20 @@ export default function App() {
       const client = handleClient.current;
       if (!account || !client) return;
       return send(`publish-${movement.id}`, async () => {
-        const { decryptionProof } = await client.publicDecrypt(movement.riskHandle);
+        // The enclave marks the band publicly decryptable after the fact, so a
+        // signer who clicks the moment a movement appears gets a 403. Wait it
+        // out rather than handing them a permissions error for a timing issue.
+        let proof: `0x${string}` | null = null;
+        for (let attempt = 0; attempt < 20 && proof === null; attempt += 1) {
+          try {
+            proof = (await client.publicDecrypt(movement.riskHandle)).decryptionProof;
+          } catch (cause) {
+            if (!/not publicly decryptable|access_denied/.test(String(cause))) throw cause;
+            await new Promise((resolve) => setTimeout(resolve, 3_000));
+          }
+        }
+        if (proof === null) throw new Error('The enclave has not published this band yet.');
+        const decryptionProof = proof;
         return walletFor(account).writeContract({
           address: ADDRESSES.module,
           abi: GhostLedgerModuleAbi,
