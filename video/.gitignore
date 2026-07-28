@@ -1,6 +1,7 @@
 raw/
 *.webm
 demo.mp4
+remotion/out/
 audio/
 remotion/node_modules/
 remotion/out/
