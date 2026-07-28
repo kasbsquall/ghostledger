@@ -207,7 +207,20 @@ npm run dev
 
 ## Deployed on Ethereum Sepolia
 
-See `deployments/sepolia.json` for the current addresses.
+Every contract is verified, so the source on the explorer is the source in this
+repository.
+
+| Contract | Address |
+|---|---|
+| Safe (GhostLedger Treasury) | [`0x7DC3B572…86A40372`](https://eth-sepolia.blockscout.com/address/0x7DC3B57286F4Fb4bF793B536B4380B3E86A40372) |
+| GhostLedgerModule | [`0xf6bc97f8…bc134b08`](https://eth-sepolia.blockscout.com/address/0xf6bc97f8a9f399dd33517ed4f4a695f8bc134b08#code) |
+| ConfidentialTreasuryLog | [`0x15d9cf24…4b926585`](https://eth-sepolia.blockscout.com/address/0x15d9cf24d1b33b37825cb79d1a4f56e24b926585#code) |
+| ConfidentialTreasuryToken | [`0x60c2f255…925c4a9e`](https://eth-sepolia.blockscout.com/address/0x60c2f25557af2cde3dd7456527d3f54f925c4a9e#code) |
+| TreasuryUSD (the wrapped ERC-20) | [`0xc399a3f3…1598d44e`](https://eth-sepolia.blockscout.com/address/0xc399a3f3474c31043140f44b8eb9b25b1598d44e#code) |
+
+The Safe runs four owners at a threshold of two, so the bands resolve to two,
+three and four signatures. `deployments/sepolia.json` carries the same addresses
+and is what the dashboard reads.
 
 ## What was built during the hackathon
 
