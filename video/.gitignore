@@ -1,3 +1,9 @@
 raw/
 *.webm
 demo.mp4
+audio/
+remotion/node_modules/
+remotion/out/
+remotion/public/final_audio.wav
+remotion/public/vid/
+probe_*.wav
