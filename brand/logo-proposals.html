@@ -1,0 +1,520 @@
+<title>GhostLedger — propuestas de marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Martian+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink:      #0a0c0e;
+    --graphite: #14181c;
+    --slate:    #1e242a;
+    --hair:     rgba(232,234,231,0.08);
+    --mute:     #6d777f;
+    --dim:      #98a2aa;
+    --bone:     #e8eae7;
+
+    --risk-clear: #4d9a72;
+    --risk-watch: #b8893c;
+    --risk-flag:  #b8524a;
+
+    --ui: 'Archivo', system-ui, sans-serif;
+    --mono: 'Martian Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--ui);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 88px 40px 140px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  h1 {
+    font-size: clamp(40px, 6vw, 68px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.94;
+    margin: 20px 0 0;
+    text-wrap: balance;
+  }
+
+  .lede {
+    max-width: 46ch;
+    color: var(--dim);
+    margin-top: 22px;
+    text-wrap: pretty;
+  }
+
+  .rule { height: 1px; background: var(--hair); margin: 72px 0 0; }
+
+  /* direction block */
+  .direction {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--hair);
+    border: 1px solid var(--hair);
+    margin-top: 56px;
+  }
+  .direction > div { background: var(--ink); padding: 22px 20px 26px; }
+  .direction dt {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .direction dd { margin: 10px 0 0; font-size: 14px; color: var(--bone); }
+
+  /* proposals */
+  .prop { margin-top: 104px; }
+
+  .prop-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .idx {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .prop h2 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    margin: 0;
+  }
+  .prop .idea {
+    max-width: 58ch;
+    color: var(--dim);
+    margin-top: 14px;
+    font-size: 14.5px;
+    text-wrap: pretty;
+  }
+
+  .stage {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 1px;
+    background: var(--hair);
+    border: 1px solid var(--hair);
+  }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--graphite); padding: 40px 36px; }
+  .panel.light { background: var(--bone); color: var(--ink); }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+    display: block;
+    margin-bottom: 30px;
+  }
+  .panel.light .panel-label { color: #7d858b; }
+
+  .hero-mark { display: block; }
+
+  .sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: 30px;
+    margin-top: 44px;
+    padding-top: 26px;
+    border-top: 1px solid var(--hair);
+  }
+  .panel.light .sizes { border-top-color: rgba(10,12,14,0.1); }
+  .size { text-align: center; }
+  .size span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--mute);
+    margin-top: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-top: 40px;
+  }
+  .lockup .name {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+  }
+  .lockup .name em { font-style: normal; color: var(--mute); }
+  .panel.light .lockup .name em { color: #8d959b; }
+
+  .notes { list-style: none; padding: 0; margin: 26px 0 0; }
+  .notes li {
+    font-size: 13.5px;
+    color: var(--dim);
+    padding: 9px 0;
+    border-bottom: 1px solid var(--hair);
+    display: flex;
+    gap: 12px;
+  }
+  .notes li:last-child { border-bottom: 0; }
+  .notes b {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mute);
+    flex: 0 0 62px;
+    padding-top: 3px;
+    font-weight: 400;
+  }
+
+  /* risk swatches */
+  .risk-row { display: flex; gap: 1px; margin-top: 56px; background: var(--hair); border: 1px solid var(--hair); }
+  .risk { flex: 1; background: var(--ink); padding: 20px 18px 22px; }
+  .risk i {
+    display: block; width: 26px; height: 3px; border-radius: 1px; margin-bottom: 16px;
+  }
+  .risk strong { font-size: 14px; font-weight: 500; display: block; }
+  .risk span {
+    font-family: var(--mono); font-size: 9.5px; color: var(--mute);
+    letter-spacing: 0.05em; display: block; margin-top: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .type-spec { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 40px; }
+  .spec-big { font-size: 34px; letter-spacing: -0.03em; font-weight: 600; }
+  .spec-mono { font-family: var(--mono); font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
+  .spec-note { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); margin-top: 12px; }
+</style>
+
+<div class="wrap">
+
+  <span class="eyebrow">GhostLedger · dirección de marca · 27.07.2026</span>
+  <h1>Tres formas de dibujar<br>algo que no se puede ver.</h1>
+  <p class="lede">La marca no lleva color. Verde, ámbar y rojo están reservados enteramente para la señal de riesgo, así que cuando aparece un rojo en pantalla no compite con nada.</p>
+
+  <dl class="direction">
+    <div><dt>Propósito</dt><dd>Se consulta antes de aprobar un movimiento. Se lee de un vistazo.</dd></div>
+    <div><dt>Audiencia</dt><dd>Firmantes de tesorería que repiten el flujo a diario.</dd></div>
+    <div><dt>Tono</dt><dd>Instrumentación forense. Densa, callada, técnica.</dd></div>
+    <div><dt>Idea</dt><dd>El dato está presente y aun así es invisible.</dd></div>
+  </dl>
+
+  <!-- ============ 01 ============ -->
+  <section class="prop">
+    <div class="prop-head">
+      <span class="idx">01</span>
+      <h2>Ausencia</h2>
+    </div>
+    <p class="idea">Un patrón de gasto dibujado como barras. Una de ellas no está pintada, solo queda su contorno. La anomalía es exactamente la que no puedes ver, y el ojo la encuentra sola porque rompe el ritmo.</p>
+
+    <div class="stage">
+      <div class="panel">
+        <span class="panel-label">Marca principal</span>
+        <svg class="hero-mark" width="150" height="150" viewBox="0 0 64 64" fill="none" aria-label="GhostLedger, concepto Ausencia">
+          <g stroke="#e8eae7" stroke-width="1.25">
+            <rect x="7"  y="34" width="7" height="18" fill="#e8eae7" stroke="none"/>
+            <rect x="18" y="25" width="7" height="27" fill="#e8eae7" stroke="none"/>
+            <rect x="29" y="39" width="7" height="13" fill="#e8eae7" stroke="none"/>
+            <rect x="40.6" y="18.6" width="5.8" height="32.8" stroke-dasharray="2.4 2.6" opacity="0.62"/>
+            <rect x="51" y="30" width="7" height="22" fill="#e8eae7" stroke="none"/>
+            <path d="M4 52.6 H60" stroke-width="1"/>
+          </g>
+        </svg>
+
+        <div class="sizes">
+          <div class="size">
+            <svg width="52" height="52" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="1.6">
+                <rect x="7" y="34" width="7" height="18" fill="#e8eae7" stroke="none"/>
+                <rect x="18" y="25" width="7" height="27" fill="#e8eae7" stroke="none"/>
+                <rect x="29" y="39" width="7" height="13" fill="#e8eae7" stroke="none"/>
+                <rect x="40.8" y="18.8" width="5.4" height="32.4" stroke-dasharray="2.6 2.8" opacity="0.66"/>
+                <rect x="51" y="30" width="7" height="22" fill="#e8eae7" stroke="none"/>
+                <path d="M4 52.8 H60" stroke-width="1.4"/>
+              </g>
+            </svg>
+            <span>52</span>
+          </div>
+          <div class="size">
+            <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="2.6">
+                <rect x="7" y="34" width="7" height="18" fill="#e8eae7" stroke="none"/>
+                <rect x="18" y="25" width="7" height="27" fill="#e8eae7" stroke="none"/>
+                <rect x="29" y="39" width="7" height="13" fill="#e8eae7" stroke="none"/>
+                <rect x="41.3" y="19.3" width="4.4" height="31.4" opacity="0.7"/>
+                <rect x="51" y="30" width="7" height="22" fill="#e8eae7" stroke="none"/>
+                <path d="M4 53 H60" stroke-width="2"/>
+              </g>
+            </svg>
+            <span>26</span>
+          </div>
+          <div class="size">
+            <svg width="17" height="17" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="3.4">
+                <rect x="7" y="34" width="7" height="18" fill="#e8eae7" stroke="none"/>
+                <rect x="18" y="25" width="7" height="27" fill="#e8eae7" stroke="none"/>
+                <rect x="29" y="39" width="7" height="13" fill="#e8eae7" stroke="none"/>
+                <rect x="41.7" y="19.7" width="3.6" height="30.6" opacity="0.72"/>
+                <rect x="51" y="30" width="7" height="22" fill="#e8eae7" stroke="none"/>
+              </g>
+            </svg>
+            <span>17</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel light">
+        <span class="panel-label">Lockup e inversión</span>
+        <div class="lockup" style="margin-top:0">
+          <svg width="34" height="34" viewBox="0 0 64 64" fill="none">
+            <g stroke="#0a0c0e" stroke-width="2">
+              <rect x="7" y="34" width="7" height="18" fill="#0a0c0e" stroke="none"/>
+              <rect x="18" y="25" width="7" height="27" fill="#0a0c0e" stroke="none"/>
+              <rect x="29" y="39" width="7" height="13" fill="#0a0c0e" stroke="none"/>
+              <rect x="41" y="19" width="5" height="32" stroke-dasharray="2.6 2.8" opacity="0.6"/>
+              <rect x="51" y="30" width="7" height="22" fill="#0a0c0e" stroke="none"/>
+              <path d="M4 52.9 H60" stroke-width="1.6"/>
+            </g>
+          </svg>
+          <span class="name">Ghost<em>Ledger</em></span>
+        </div>
+        <ul class="notes">
+          <li><b>Fuerte</b><span>El concepto se entiende sin explicarlo. Es un libro contable y la anomalía a la vez.</span></li>
+          <li><b>Fuerte</b><span>La barra fantasma puede animarse en la interfaz cuando se detecta un riesgo.</span></li>
+          <li><b>Riesgo</b><span>A 17px el punteado se degrada. Necesita una variante sólida para favicon.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 ============ -->
+  <section class="prop">
+    <div class="prop-head">
+      <span class="idx">02</span>
+      <h2>Interferencia</h2>
+    </div>
+    <p class="idea">Un solo juego de líneas paralelas. Dentro de una región, las líneas se desplazan unos píxeles y de ese desfase emerge un rombo que nunca se dibujó. La forma existe solo por la diferencia entre dos capas, que es literalmente cómo funciona un handle encriptado.</p>
+
+    <div class="stage">
+      <div class="panel">
+        <span class="panel-label">Marca principal</span>
+        <svg class="hero-mark" width="150" height="150" viewBox="0 0 64 64" fill="none" aria-label="GhostLedger, concepto Interferencia">
+          <defs>
+            <clipPath id="dia-a"><path d="M32 9 L55 32 L32 55 L9 32 Z"/></clipPath>
+            <mask id="not-dia-a">
+              <rect width="64" height="64" fill="#fff"/>
+              <path d="M32 9 L55 32 L32 55 L9 32 Z" fill="#000"/>
+            </mask>
+          </defs>
+          <g stroke="#e8eae7" stroke-width="1.15" stroke-linecap="square">
+            <g mask="url(#not-dia-a)" opacity="0.5">
+              <path d="M6 12H58M6 18H58M6 24H58M6 30H58M6 36H58M6 42H58M6 48H58M6 54H58"/>
+            </g>
+            <g clip-path="url(#dia-a)">
+              <path d="M2 15H62M2 21H62M2 27H62M2 33H62M2 39H62M2 45H62M2 51H62"/>
+            </g>
+            <path d="M32 9 L55 32 L32 55 L9 32 Z" stroke-width="1.15" opacity="0.28"/>
+          </g>
+        </svg>
+
+        <div class="sizes">
+          <div class="size">
+            <svg width="52" height="52" viewBox="0 0 64 64" fill="none">
+              <defs>
+                <clipPath id="dia-b"><path d="M32 10 L54 32 L32 54 L10 32 Z"/></clipPath>
+                <mask id="not-dia-b"><rect width="64" height="64" fill="#fff"/><path d="M32 10 L54 32 L32 54 L10 32 Z" fill="#000"/></mask>
+              </defs>
+              <g stroke="#e8eae7" stroke-width="1.7" stroke-linecap="square">
+                <g mask="url(#not-dia-b)" opacity="0.5"><path d="M6 13H58M6 21H58M6 29H58M6 37H58M6 45H58M6 53H58"/></g>
+                <g clip-path="url(#dia-b)"><path d="M2 17H62M2 25H62M2 33H62M2 41H62M2 49H62"/></g>
+              </g>
+            </svg>
+            <span>52</span>
+          </div>
+          <div class="size">
+            <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+              <defs>
+                <clipPath id="dia-c"><path d="M32 11 L53 32 L32 53 L11 32 Z"/></clipPath>
+                <mask id="not-dia-c"><rect width="64" height="64" fill="#fff"/><path d="M32 11 L53 32 L32 53 L11 32 Z" fill="#000"/></mask>
+              </defs>
+              <g stroke="#e8eae7" stroke-width="3.1" stroke-linecap="square">
+                <g mask="url(#not-dia-c)" opacity="0.5"><path d="M6 14H58M6 26H58M6 38H58M6 50H58"/></g>
+                <g clip-path="url(#dia-c)"><path d="M2 20H62M2 32H62M2 44H62"/></g>
+              </g>
+            </svg>
+            <span>26</span>
+          </div>
+          <div class="size">
+            <svg width="17" height="17" viewBox="0 0 64 64" fill="none">
+              <defs>
+                <clipPath id="dia-d"><path d="M32 12 L52 32 L32 52 L12 32 Z"/></clipPath>
+                <mask id="not-dia-d"><rect width="64" height="64" fill="#fff"/><path d="M32 12 L52 32 L32 52 L12 32 Z" fill="#000"/></mask>
+              </defs>
+              <g stroke="#e8eae7" stroke-width="4.6" stroke-linecap="square">
+                <g mask="url(#not-dia-d)" opacity="0.55"><path d="M6 16H58M6 32H58M6 48H58"/></g>
+                <g clip-path="url(#dia-d)"><path d="M2 24H62M2 40H62"/></g>
+              </g>
+            </svg>
+            <span>17</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel light">
+        <span class="panel-label">Lockup e inversión</span>
+        <div class="lockup" style="margin-top:0">
+          <svg width="34" height="34" viewBox="0 0 64 64" fill="none">
+            <defs>
+              <clipPath id="dia-e"><path d="M32 10 L54 32 L32 54 L10 32 Z"/></clipPath>
+              <mask id="not-dia-e"><rect width="64" height="64" fill="#fff"/><path d="M32 10 L54 32 L32 54 L10 32 Z" fill="#000"/></mask>
+            </defs>
+            <g stroke="#0a0c0e" stroke-width="2.2" stroke-linecap="square">
+              <g mask="url(#not-dia-e)" opacity="0.45"><path d="M6 13H58M6 21H58M6 29H58M6 37H58M6 45H58M6 53H58"/></g>
+              <g clip-path="url(#dia-e)"><path d="M2 17H62M2 25H62M2 33H62M2 41H62M2 49H62"/></g>
+            </g>
+          </svg>
+          <span class="name">Ghost<em>Ledger</em></span>
+        </div>
+        <ul class="notes">
+          <li><b>Fuerte</b><span>Sobrevive a cualquier tamaño. El rombo aparece incluso con tres líneas.</span></li>
+          <li><b>Fuerte</b><span>El desplazamiento es animable: la forma se revela al cargar.</span></li>
+          <li><b>Riesgo</b><span>Es la más abstracta. Sin contexto puede leerse solo como una textura.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 ============ -->
+  <section class="prop">
+    <div class="prop-head">
+      <span class="idx">03</span>
+      <h2>Obturador</h2>
+    </div>
+    <p class="idea">Un diafragma de cámara con seis hojas, pero el centro está cerrado en sólido en lugar de abierto. Es el gesto de mirar y no ver nada. Combina auditoría y opacidad en una sola forma cerrada, que es la mejor descripción posible del producto.</p>
+
+    <div class="stage">
+      <div class="panel">
+        <span class="panel-label">Marca principal</span>
+        <svg class="hero-mark" width="150" height="150" viewBox="0 0 64 64" fill="none" aria-label="GhostLedger, concepto Obturador">
+          <g stroke="#e8eae7" stroke-width="1.25" stroke-linejoin="round">
+            <circle cx="32" cy="32" r="24" opacity="0.34"/>
+            <path d="M32 8.8 L47.2 17.6 M47.2 17.6 L47.2 46.4 M47.2 46.4 L32 55.2 M32 55.2 L16.8 46.4 M16.8 46.4 L16.8 17.6 M16.8 17.6 L32 8.8" opacity="0.5"/>
+            <path d="M32 19.6 L42.8 25.8 L42.8 38.2 L32 44.4 L21.2 38.2 L21.2 25.8 Z" fill="#e8eae7" stroke="none"/>
+            <path d="M32 8.8 L32 19.6 M47.2 17.6 L42.8 25.8 M47.2 46.4 L42.8 38.2 M32 55.2 L32 44.4 M16.8 46.4 L21.2 38.2 M16.8 17.6 L21.2 25.8"/>
+          </g>
+        </svg>
+
+        <div class="sizes">
+          <div class="size">
+            <svg width="52" height="52" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="1.8" stroke-linejoin="round">
+                <circle cx="32" cy="32" r="24" opacity="0.34"/>
+                <path d="M32 20 L42.4 26 L42.4 38 L32 44 L21.6 38 L21.6 26 Z" fill="#e8eae7" stroke="none"/>
+                <path d="M32 8.8 L32 20 M47.2 17.6 L42.4 26 M47.2 46.4 L42.4 38 M32 55.2 L32 44 M16.8 46.4 L21.6 38 M16.8 17.6 L21.6 26"/>
+              </g>
+            </svg>
+            <span>52</span>
+          </div>
+          <div class="size">
+            <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="3.2" stroke-linejoin="round">
+                <circle cx="32" cy="32" r="23.5" opacity="0.38"/>
+                <path d="M32 21 L41.5 26.5 L41.5 37.5 L32 43 L22.5 37.5 L22.5 26.5 Z" fill="#e8eae7" stroke="none"/>
+                <path d="M32 9.5 L32 21 M46.6 18 L41.5 26.5 M46.6 46 L41.5 37.5 M32 54.5 L32 43 M17.4 46 L22.5 37.5 M17.4 18 L22.5 26.5"/>
+              </g>
+            </svg>
+            <span>26</span>
+          </div>
+          <div class="size">
+            <svg width="17" height="17" viewBox="0 0 64 64" fill="none">
+              <g stroke="#e8eae7" stroke-width="4.4" stroke-linejoin="round">
+                <circle cx="32" cy="32" r="23" opacity="0.42"/>
+                <path d="M32 22 L40.6 27 L40.6 37 L32 42 L23.4 37 L23.4 27 Z" fill="#e8eae7" stroke="none"/>
+                <path d="M32 10 L32 22 M46 18.5 L40.6 27 M46 45.5 L40.6 37 M32 54 L32 42 M18 45.5 L23.4 37 M18 18.5 L23.4 27"/>
+              </g>
+            </svg>
+            <span>17</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel light">
+        <span class="panel-label">Lockup e inversión</span>
+        <div class="lockup" style="margin-top:0">
+          <svg width="34" height="34" viewBox="0 0 64 64" fill="none">
+            <g stroke="#0a0c0e" stroke-width="2.2" stroke-linejoin="round">
+              <circle cx="32" cy="32" r="24" opacity="0.32"/>
+              <path d="M32 20 L42.4 26 L42.4 38 L32 44 L21.6 38 L21.6 26 Z" fill="#0a0c0e" stroke="none"/>
+              <path d="M32 8.8 L32 20 M47.2 17.6 L42.4 26 M47.2 46.4 L42.4 38 M32 55.2 L32 44 M16.8 46.4 L21.6 38 M16.8 17.6 L21.6 26"/>
+            </g>
+          </svg>
+          <span class="name">Ghost<em>Ledger</em></span>
+        </div>
+        <ul class="notes">
+          <li><b>Fuerte</b><span>La más ownable de las tres. Se reconoce a 17px y funciona como sello.</span></li>
+          <li><b>Fuerte</b><span>El hexágono central puede tomar el color del riesgo sin romper la marca.</span></li>
+          <li><b>Riesgo</b><span>El diafragma es una metáfora vista antes en productos de privacidad.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- risk scale -->
+  <span class="eyebrow" style="display:block;margin-top:52px">Escala de riesgo · el único color del sistema</span>
+  <div class="risk-row">
+    <div class="risk">
+      <i style="background:var(--risk-clear)"></i>
+      <strong>Dentro de patrón</strong>
+      <span>&lt; 2x promedio · destino conocido</span>
+    </div>
+    <div class="risk">
+      <i style="background:var(--risk-watch)"></i>
+      <strong>Revisar</strong>
+      <span>2x a 5x promedio · destino conocido</span>
+    </div>
+    <div class="risk">
+      <i style="background:var(--risk-flag)"></i>
+      <strong>Anómalo</strong>
+      <span>&gt; 5x promedio · o destino nuevo</span>
+    </div>
+  </div>
+
+  <!-- type -->
+  <span class="eyebrow" style="display:block;margin-top:64px">Tipografía</span>
+  <div class="type-spec">
+    <div>
+      <div class="spec-big">Movimiento pendiente</div>
+      <div class="spec-note">Archivo · interfaz · OFL</div>
+    </div>
+    <div>
+      <div class="spec-mono">0x24ef…f77bf · 148,209.50</div>
+      <div class="spec-note">Martian Mono · handles y cifras · OFL</div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,13 @@
+node_modules/
+artifacts/
+cache/
+types/
+dist/
+frontend/dist/
+frontend/node_modules/
+
+# Never commit keys or secrets.
+.env
+.env.*
+*.key
+keystore/

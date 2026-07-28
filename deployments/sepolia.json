@@ -1,0 +1,11 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "safe": "0x7DC3B57286F4Fb4bF793B536B4380B3E86A40372",
+  "treasuryUSD": "0xc399a3f3474c31043140f44b8eb9b25b1598d44e",
+  "confidentialToken": "0x60c2f25557af2cde3dd7456527d3f54f925c4a9e",
+  "treasuryLog": "0x15d9cf24d1b33b37825cb79d1a4f56e24b926585",
+  "ghostLedgerModule": "0xf6bc97f8a9f399dd33517ed4f4a695f8bc134b08",
+  "watchFactor": 2,
+  "flagFactor": 5
+}

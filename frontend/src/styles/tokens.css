@@ -1,0 +1,162 @@
+/*
+ * GhostLedger design tokens.
+ *
+ * The system has no brand colour on purpose. Every drop of chroma is spent on
+ * the risk scale, so a red badge has nothing to compete with. Greys are tinted
+ * cool and consistently; pure black and pure white never appear.
+ */
+
+:root {
+  /* surfaces, coolest to warmest */
+  --ink: #0a0c0e;
+  --graphite: #101418;
+  --slate: #161c21;
+  --raised: #1c2329;
+
+  --hair: rgba(232, 234, 231, 0.075);
+  --hair-strong: rgba(232, 234, 231, 0.14);
+
+  /* text */
+  --bone: #e8eae7;
+  --bone-lift: #f3f5f2;
+  --dim: #99a3ab;
+  --mute: #6b757d;
+  --faint: #454e55;
+
+  /* the only chroma in the product */
+  --clear: #4d9a72;
+  --watch: #b8893c;
+  --flag: #b8524a;
+  --clear-wash: rgba(77, 154, 114, 0.12);
+  --watch-wash: rgba(184, 137, 60, 0.12);
+  --flag-wash: rgba(184, 82, 74, 0.13);
+
+  /* type */
+  --ui: 'Archivo Variable', 'Archivo', sans-serif;
+  --mono: 'Martian Mono', ui-monospace, monospace;
+
+  /* modular scale, 1.25 */
+  --t-micro: 9.5px;
+  --t-small: 11.5px;
+  --t-body: 14px;
+  --t-lead: 17.5px;
+  --t-title: 27px;
+  --t-display: 54px;
+  --t-hero: 76px;
+
+  /* spacing with rhythm: the ratio between the smallest and largest step is
+     1:24, so grouping reads as grouping and separation reads as separation */
+  --s-1: 3px;
+  --s-2: 6px;
+  --s-3: 10px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 40px;
+  --s-7: 72px;
+
+  --radius: 3px;
+
+  --dur-micro: 120ms;
+  --dur-ui: 200ms;
+  --dur-panel: 260ms;
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--ui);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+
+/* Every figure in this product is tabular. Columns of numbers that shift
+   width as they update read as noise in a monitoring tool. */
+.num,
+td.num,
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  letter-spacing: -0.01em;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 1px solid var(--bone);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--hair-strong);
+}
+
+/* Entry choreography. Blocks rise 60ms apart, rows 30ms apart capped at eight,
+   so a long list never feels like it is loading in slow motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise var(--dur-panel) var(--ease-enter) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.rise-row {
+  animation: rise 220ms var(--ease-enter) both;
+  animation-delay: calc(120ms + var(--i, 0) * 30ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

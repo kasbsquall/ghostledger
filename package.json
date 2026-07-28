@@ -1,0 +1,27 @@
+{
+  "name": "ghostledger",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@iexec-nox/handle": "^0.1.0-beta.13",
+    "@iexec-nox/nox-confidential-contracts": "^0.2.2",
+    "@iexec-nox/nox-protocol-contracts": "^0.2.4",
+    "@openzeppelin/contracts": "^5.6.1",
+    "viem": "^2.55.10"
+  },
+  "devDependencies": {
+    "@iexec-nox/nox-hardhat-plugin": "^0.1.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
+    "@types/node": "^26.1.2",
+    "hardhat": "^3.11.1",
+    "typescript": "^7.0.2"
+  },
+  "type": "module"
+}
