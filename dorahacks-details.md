@@ -103,5 +103,5 @@ Feedback on the iExec tooling, with eight reproducible defects and the fix each 
 - **Live dashboard: https://kasbsquall.github.io/ghostledger/** (reads Sepolia directly, no wallet needed to look)
 - **Demo video, 1:53: https://youtu.be/iB0jUm5lIhU**
 - Code: https://github.com/kasbsquall/ghostledger
-- Submission post: https://x.com/p36649/status/2082238669327310868
+- Submission post: https://x.com/p36649/status/2082516884591636544
 - Feedback on iExec Nox: https://github.com/kasbsquall/ghostledger/blob/main/feedback.md

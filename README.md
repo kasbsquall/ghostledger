@@ -273,7 +273,7 @@ Feedback on the iExec tooling is in [feedback.md](feedback.md).
 |---|---|
 | Live dashboard | https://kasbsquall.github.io/ghostledger/ |
 | Demo video, 1:53 | https://youtu.be/iB0jUm5lIhU |
-| Submission post | https://x.com/p36649/status/2082238669327310868 |
+| Submission post | https://x.com/p36649/status/2082516884591636544 |
 | Feedback on iExec Nox | [feedback.md](feedback.md) |
 
 ## License
