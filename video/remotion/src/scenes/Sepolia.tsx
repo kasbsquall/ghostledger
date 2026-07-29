@@ -38,8 +38,11 @@ export const Sepolia: React.FC = () => {
       <AbsoluteFill
         style={{
           alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingTop: 78,
+          // Cropping the explorer ad out of the capture made the card shorter,
+          // which left it pinned to the top with a void beneath. Centred, and
+          // lifted clear of the caption band.
+          justifyContent: 'center',
+          paddingBottom: 150,
           opacity: shot,
           transform: `scale(${push}) translateY(${(1 - shot) * 12}px)`,
         }}
@@ -48,7 +51,7 @@ export const Sepolia: React.FC = () => {
             full-bleed capture with no address bar reads as a slide. */}
         <div
           style={{
-            width: 1680,
+            width: 1760,
             borderRadius: 8,
             overflow: 'hidden',
             border: `1px solid ${C.hairStrong}`,
