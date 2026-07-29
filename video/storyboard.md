@@ -25,12 +25,17 @@ On screen: `Anomalous · 4 of 4 signatures required`.
 
 One line types under it:
 
-> Four people have to sign this payout. None of them can see what it is for.
+> Four people have to sign this payout. None of them can see how much it is.
 
 Stamp hit, cut.
 
 **Changed:** "nobody in this room" cut. There is no room, no people, no stakes
 on screen, and the word asked a viewer to imagine something not shown.
+
+**Changed again:** "what it is for" became "how much it is". The destination
+address is public by design and visible in this very shot, so the film's first
+claim was one the project itself disclaims two paragraphs into its README.
+GhostLedger hides how much, not to whom, and the opening line now says that.
 
 ---
 

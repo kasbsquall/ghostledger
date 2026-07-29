@@ -107,11 +107,23 @@ export const Close: React.FC = () => {
                 letterSpacing: '-0.01em',
               }}
             >
+              kasbsquall.github.io/ghostledger
+            </div>
+            <div
+              style={{
+                marginTop: 7,
+                fontFamily: MONO,
+                fontWeight: 300,
+                fontSize: 17,
+                color: C.mute,
+                letterSpacing: '-0.005em',
+              }}
+            >
               github.com/kasbsquall/ghostledger
             </div>
             <div
               style={{
-                marginTop: 10,
+                marginTop: 12,
                 fontFamily: MONO,
                 fontWeight: 300,
                 fontSize: 14,

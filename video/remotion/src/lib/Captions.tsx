@@ -2,6 +2,7 @@ import {useCurrentFrame, useVideoConfig} from 'remotion';
 import React from 'react';
 import capsRaw from '../data/captions.json';
 import {INTER, C} from '../theme';
+import {SCENES} from '../timing';
 
 type Word = {t: number; e: number; w: string};
 const caps = capsRaw as Word[];
@@ -24,11 +25,20 @@ const LINES: Line[] = (() => {
   return lines;
 })();
 
+/**
+ * The end card sets the closing line as display type, at 96px, centre frame.
+ * A caption box under it repeating the same sentence word for word is the one
+ * place where two type systems are unambiguously saying one thing, so the
+ * captions stand down for the length of that scene and let the card speak.
+ */
+const CLOSE = SCENES.find((s) => s.id === 'close');
+
 // Burned-in karaoke captions.
 export const Captions: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const t = frame / fps;
+  if (CLOSE && frame >= CLOSE.startF) return null;
   const line = LINES.find((l) => t >= l.start - 0.12 && t <= l.end + 0.35);
   if (!line) return null;
   return (

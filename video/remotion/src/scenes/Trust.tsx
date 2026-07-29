@@ -5,6 +5,7 @@ import run from '../data/testrun.json';
 import {Sfx} from '../lib/Sfx';
 
 const ease = Easing.bezier(...(EASE_IN as unknown as [number, number, number, number]));
+const camera = Easing.bezier(0.5, 0, 0.25, 1);
 
 const rise = (f: number, at: number, dur = 14) =>
   interpolate(f, [at, at + dur], [0, 1], {
@@ -31,6 +32,17 @@ export const Trust: React.FC = () => {
   const frame = rise(f, 2, 16);
   const head = rise(f, 250);
 
+  // The suite finishes printing around frame 264 and the scene runs to ~513,
+  // so the last eight seconds used to be one motionless card. Two judges
+  // counted them. The narration cannot be shortened, so the frame earns the
+  // time instead: a slow push, and a focus pull onto the line that carries the
+  // claim once the headline has landed.
+  const push = interpolate(f, [0, 513], [1, 1.035], {
+    extrapolateRight: 'clamp',
+    easing: camera,
+  });
+  const focus = rise(f, 272, 40);
+
   return (
     <AbsoluteFill style={{background: C.ink}}>
       <Ground tone="warm" />
@@ -51,7 +63,8 @@ export const Trust: React.FC = () => {
             background: C.graphite,
             boxShadow: '0 40px 110px rgba(0,0,0,0.62)',
             opacity: frame,
-            transform: `translateY(${(1 - frame) * 12}px)`,
+            transform: `translateY(${(1 - frame) * 12}px) scale(${push})`,
+            transformOrigin: '50% 42%',
             overflow: 'hidden',
           }}
         >
@@ -69,8 +82,10 @@ export const Trust: React.FC = () => {
             }}
           >
             <span style={{color: C.clear}}>$</span> npx hardhat test
-            <span style={{marginLeft: 'auto', fontSize: 14, letterSpacing: '0.1em'}}>
-              nox stack · intel tdx runner · docker
+            {/* Raised from 14px and named properly. A sponsor judge should not
+                have to reach the final card to see whose stack this runs on. */}
+            <span style={{marginLeft: 'auto', fontSize: 17, letterSpacing: '0.06em', color: C.dim}}>
+              iExec Nox · intel tdx runner · docker
             </span>
           </div>
 
@@ -105,7 +120,10 @@ export const Trust: React.FC = () => {
                     alignItems: 'baseline',
                     gap: 18,
                     padding: '8px 0',
-                    opacity: o,
+                    // Once the headline lands, the nine supporting cases step
+                    // back and the forgery case stays lit. Same evidence, read
+                    // in the order the argument needs it.
+                    opacity: isHero ? o : o * (1 - focus * 0.58),
                     transform: `translateX(${(1 - o) * -8}px)`,
                   }}
                 >
@@ -178,8 +196,13 @@ export const Trust: React.FC = () => {
             color: C.bone,
           }}
         >
-          Hand it a band the enclave never signed,{' '}
-          <span style={{color: C.flag}}>and the transaction reverts.</span>
+          {/* This used to read "Hand it a band the enclave never signed, and
+              the transaction reverts", which is the subtitle's sentence in
+              different words. Two versions of one claim on screen at once read
+              as two claims. The voice makes that point; this line answers the
+              question the voice leaves open, which is whether any of it ran. */}
+          Ten tests, against a real enclave in Docker.{' '}
+          <span style={{color: C.clear}}>Not a mock.</span>
         </span>
       </div>
     </AbsoluteFill>

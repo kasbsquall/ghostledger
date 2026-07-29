@@ -27,7 +27,8 @@ export type Status = (typeof STATUS)[number];
 /** Band 0 means the TEE result has not been brought on-chain yet. */
 export type Band = 0 | 1 | 2 | 3;
 
-export const EXPLORER = 'https://sepolia.etherscan.io';
+/** Blockscout, to match the verified sources the README links. */
+export const EXPLORER = 'https://eth-sepolia.blockscout.com';
 
 export function short(address: string) {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;

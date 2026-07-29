@@ -22,6 +22,9 @@
   },
   "devDependencies": {
     "@types/react": "18.3.12",
+    "jsqr": "^1.4.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.3",
     "typescript": "5.5.4"
   }
 }

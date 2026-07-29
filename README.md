@@ -2,6 +2,9 @@
 
 **Anomaly detection for a DAO treasury, where the amount is never revealed.**
 
+**Live dashboard: https://kasbsquall.github.io/ghostledger/** — reads the
+contracts below straight from Sepolia, no wallet needed to look.
+
 Built for the [iExec WTF Hackathon Summer Edition](https://dorahacks.io/hackathon/wtf-hackathon/detail)
 on [Nox](https://docs.noxprotocol.io), the confidential computing layer of iExec.
 
@@ -46,11 +49,18 @@ about that is the point, because the gap left over is narrow and real.
 
 **Hypernative Guardian** is integrated natively in Safe{Wallet} and advertises
 behavioural anomaly detection on "unusual timing, amounts, counterparties, and
-patterns." **Chainalysis Hexagate** baselines each wallet against its own
-history. **Blockaid** and **Redefine** put risk colours in the Safe UI today.
-**Safe Shield** is Safe's own framework for the same job. GhostLedger does not
-claim to detect better than any of them, and with one threshold rule it plainly
-does not.
+patterns", though it publishes no mechanism and what reaches Safe users is a
+static ceiling: Safe's own help centre lists the policy as "limit transfers
+above a specific amount." **Chainalysis Hexagate** says its monitors "learn how
+wallets behave over time", and every capability it then enumerates is timing,
+frequency, or a change of authority. **Blockaid** screens by simulation against
+known-malicious heuristics. **Safe Shield Copilot** already does per-wallet
+novelty detection, on counterparties: it "surfaces unusual patterns (e.g., a
+destination with very limited history)."
+
+So the incumbent has shipped half of this idea and left the amount half as a
+static threshold. GhostLedger does not claim to detect better than any of them,
+and with one threshold rule it plainly does not.
 
 Every one of those systems needs the amount in plaintext to evaluate it.
 
@@ -69,11 +79,24 @@ amount, evaluates it, and still never learns it.
 
 What follows from that, and what makes the confidentiality load-bearing rather
 than decorative: **the number of signatures a payout needs is derived from data
-nobody can read.** A monitoring product tells you something looks wrong. This
-changes what the treasury will actually let you do, without anyone, including
-the operators of this contract, seeing the figure that decided it.
+the signers themselves cannot read.** A monitoring product tells you something
+looks wrong. This changes what the treasury will actually let you do, and the
+owners voting on it never see the figure that set the bar. Nor does the module,
+nor anyone watching the chain. One role can, and it is named under Known limits
+below rather than left for a reader to find.
 
 ### Known limits
+
+**The log's `owner` role can reconstruct executed amounts, and in this
+deployment that role is the deployer.** `ConfidentialTreasuryLog` grants
+`owner` decrypt access to the running total on every write, and each executed
+movement folds exactly one payout into it. Decrypt before, decrypt after,
+subtract, and you have the figure. The Safe owners, the module and every
+observer still never see it, but "nobody at all" is not what this deployment
+achieves. The grant exists so a treasury can audit its own aggregate; pointing
+it at the Safe instead of an EOA makes revealing the aggregate itself require
+the multisig. Three lines in the constructor and in `recordMovement`, and the
+right fix before anyone runs this for real.
 
 A public comparison result is a comparison oracle. An owner can propose amounts
 and read bands to bisect the running average, and proposing is cheap. Rate
@@ -199,6 +222,9 @@ call `enableModule` with the deployed module address.
 
 ### Run the dashboard
 
+It is already running at https://kasbsquall.github.io/ghostledger/ against the
+Sepolia deployment below. To run it yourself:
+
 ```bash
 cd frontend
 npm install
@@ -207,8 +233,12 @@ npm run dev
 
 ## Deployed on Ethereum Sepolia
 
-Every contract is verified, so the source on the explorer is the source in this
-repository.
+Every contract is verified. One caveat worth stating: Blockscout serves
+`ConfidentialTreasuryToken` under the name `KairosWrappedToken`, because its
+bytecode matches a third-party contract verified earlier and the explorer
+resolved it from its bytecode database. The deployed bytecode is the one this
+repository compiles, and the constructor arguments decode to "Confidential
+Treasury USD" / "cTUSD", but the name on the explorer is not ours.
 
 | Contract | Address |
 |---|---|

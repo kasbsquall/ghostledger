@@ -106,7 +106,7 @@ export const ColdOpen: React.FC = () => {
         >
           Four people have to sign this payout.
           <br />
-          <span style={{color: C.flag}}>None of them can see what it is for.</span>
+          <span style={{color: C.flag}}>None of them can see how much it is.</span>
         </p>
       </AbsoluteFill>
     </AbsoluteFill>
