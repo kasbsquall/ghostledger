@@ -83,9 +83,12 @@ export const Trust: React.FC = () => {
           >
             <span style={{color: C.clear}}>$</span> npx hardhat test
             {/* Raised from 14px and named properly. A sponsor judge should not
-                have to reach the final card to see whose stack this runs on. */}
+                have to reach the final card to see whose stack this runs on.
+                "intel tdx runner" was dropped in the same pass: raising a claim
+                to legible size means it has to survive being read, and what
+                boots here is the gateway and runner in containers. */}
             <span style={{marginLeft: 'auto', fontSize: 17, letterSpacing: '0.06em', color: C.dim}}>
-              iExec Nox · intel tdx runner · docker
+              iExec Nox · gateway + runner · docker
             </span>
           </div>
 
@@ -200,8 +203,15 @@ export const Trust: React.FC = () => {
               the transaction reverts", which is the subtitle's sentence in
               different words. Two versions of one claim on screen at once read
               as two claims. The voice makes that point; this line answers the
-              question the voice leaves open, which is whether any of it ran. */}
-          Ten tests, against a real enclave in Docker.{' '}
+              question the voice leaves open, which is whether any of it ran.
+
+              It says "the Nox stack", not "a real enclave". The suite boots the
+              Nox offchain services in containers, which is a genuine runner and
+              not a mock, but a local container is not attested Intel TDX. The
+              hardware claim was cut from this beat once already for exactly
+              that reason and does not come back without an attestation
+              artefact. See HANDOFF.md. */}
+          Ten tests, against the Nox stack in Docker.{' '}
           <span style={{color: C.clear}}>Not a mock.</span>
         </span>
       </div>
