@@ -5,6 +5,8 @@
 **Live dashboard: https://kasbsquall.github.io/ghostledger/** — reads the
 contracts below straight from Sepolia, no wallet needed to look.
 
+**Demo video (1:53): https://youtu.be/iB0jUm5lIhU**
+
 Built for the [iExec WTF Hackathon Summer Edition](https://dorahacks.io/hackathon/wtf-hackathon/detail)
 on [Nox](https://docs.noxprotocol.io), the confidential computing layer of iExec.
 
@@ -264,6 +266,15 @@ the ERC-20 wrapper), `@iexec-nox/handle` (JS SDK),
 `@iexec-nox/nox-hardhat-plugin`, OpenZeppelin Contracts, viem, React.
 
 Feedback on the iExec tooling is in [feedback.md](feedback.md).
+
+## Links
+
+| | |
+|---|---|
+| Live dashboard | https://kasbsquall.github.io/ghostledger/ |
+| Demo video, 1:53 | https://youtu.be/iB0jUm5lIhU |
+| Submission post | https://x.com/p36649/status/2082238669327310868 |
+| Feedback on iExec Nox | [feedback.md](feedback.md) |
 
 ## License
 
