@@ -1,6 +1,6 @@
 # GhostLedger
 
-**Anomaly detection for a DAO treasury, where the amount is never revealed.**
+**Anomaly detection for a DAO treasury, where the signers never see the amount.**
 
 **Live dashboard: https://kasbsquall.github.io/ghostledger/** — reads the
 contracts below straight from Sepolia, no wallet needed to look.
@@ -144,6 +144,13 @@ GhostLedger exists.
                              ▼
                              ConfidentialTreasuryToken.confidentialTransfer
 ```
+
+"Runner (Intel TDX)" describes Nox's own architecture, not something this
+project demonstrates. Nothing here carries an attestation artefact, and the
+test suite runs the Nox gateway and runner in local containers. What these
+contracts do prove is narrower and checkable: the amount is compared without
+being decrypted, only the derived band is ever publicly decryptable, and a
+band the gateway did not sign is refused on chain.
 
 | Contract | Role |
 |---|---|
