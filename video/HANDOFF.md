@@ -26,7 +26,8 @@ safe     95.79 → 106.88   11.10s
 close   107.16 → 112.09    4.92s
 ```
 
-Plus a 7s cold open before the voice enters, so the film runs about **1:59**.
+Plus a 7s cold open before the voice enters. The shipped master runs **1:53**
+(3389 frames at 30fps); earlier estimates of 1:59 and 2:12 predate the final cut.
 The cap is 4:00.
 
 ## Left to do, in order

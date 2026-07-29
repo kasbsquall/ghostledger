@@ -3,6 +3,20 @@ import deployment from '../../../deployments/sepolia.json';
 
 export const CHAIN = sepolia;
 
+/**
+ * A short list of public Sepolia endpoints, tried in order with failover.
+ * A dashboard hanging off a single hardcoded RPC dies the moment that endpoint
+ * rate-limits the viewer's IP, and then the whole page reads as broken when the
+ * contracts behind it are fine. viem's `fallback` transport ranks these and
+ * moves to the next on error, so one bad endpoint during judging is invisible.
+ */
+export const RPC_ENDPOINTS = [
+  'https://ethereum-sepolia-rpc.publicnode.com',
+  'https://sepolia.drpc.org',
+  'https://1rpc.io/sepolia',
+  'https://rpc.sepolia.org',
+] as const;
+
 export const ADDRESSES = {
   safe: deployment.safe as `0x${string}`,
   module: deployment.ghostLedgerModule as `0x${string}`,

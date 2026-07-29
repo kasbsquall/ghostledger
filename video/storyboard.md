@@ -1,6 +1,8 @@
 # GhostLedger — film v3
 
-**Runtime 2:12.** Verified: 7+18+45+8+22+10+12 = 122s.
+**Runtime 1:53** in the shipped master (3389 frames at 30fps). The 2:12 below
+is an early storyboard estimate; scene timing was later measured from the
+rendered audio and the film tightened.
 
 Third pass. Four blind judges across two rounds, none told whose project this
 was. v3 acts on what all four converged on rather than on any single note.

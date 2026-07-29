@@ -87,6 +87,30 @@ owners voting on it never see the figure that set the bar. Nor does the module,
 nor anyone watching the chain. One role can, and it is named under Known limits
 below rather than left for a reader to find.
 
+That is the line that separates this from every confidential-treasury tool
+next to it. The rest encrypt what you can **see**; the amount is hidden on the
+display and revealed again the moment it settles, because a plaintext transfer
+carries its value in the clear. GhostLedger encrypts what the treasury will
+**do**, and because the payout moves as an ERC-7984 confidential token, the
+figure stays hidden through execution too. There is no settlement at which the
+number becomes public and no arithmetic that recovers it from a transfer
+amount. The only thing that is ever published is a three-way band, and a band
+of "over 5× the average" is not a number anyone can divide back into a salary.
+
+### See it for yourself in one command
+
+The strongest claim a submission can make is one you can check without trusting
+it. From a clone, with nothing installed but `curl`, no wallet and no Docker:
+
+```bash
+bash scripts/verify-live.sh
+```
+
+It reads Sepolia in front of you and prints that the module is enabled on the
+real Safe, that ten movements exist, and that each one's published band matches
+the exact number of signatures the contract demanded. What it cannot print is
+any amount, because none is public. That asymmetry is the product.
+
 ### Known limits
 
 **The log's `owner` role can reconstruct executed amounts, and in this

@@ -56,7 +56,9 @@ The underlying ERC-20 is untouched as well: it is wrapped into an ERC-7984 confi
 | ConfidentialTreasuryToken | [`0x60c2f255…925c4a9e`](https://eth-sepolia.blockscout.com/address/0x60c2f25557af2cde3dd7456527d3f54f925c4a9e#code) |
 | TreasuryUSD, the wrapped ERC-20 | [`0xc399a3f3…1598d44e`](https://eth-sepolia.blockscout.com/address/0xc399a3f3474c31043140f44b8eb9b25b1598d44e#code) |
 
-The dashboard at **https://kasbsquall.github.io/ghostledger/** reads every row live from these contracts. No mock data anywhere: if the endpoint fails it says so rather than rendering a plausible number. Looking requires no wallet; only publishing a band, signing or executing does.
+The dashboard at **https://kasbsquall.github.io/ghostledger/** reads every row live from these contracts, over a list of endpoints with failover so a single rate-limited RPC never takes the page down. No mock data anywhere: if every endpoint fails it says so rather than rendering a plausible number. Looking requires no wallet; only publishing a band, signing or executing does.
+
+You do not have to take any of that on trust. `bash scripts/verify-live.sh` reads Sepolia from your own machine with nothing but curl, no wallet and no Docker, and prints that the module is enabled on the real Safe and that each movement's published band matches the signatures the contract demanded. What it cannot print is any amount, because none is public. Every confidential-treasury tool next to this one hides the amount on screen and reveals it again at settlement, because a plaintext transfer carries its value in the clear. Here the payout moves as an ERC-7984 confidential token, so the figure stays hidden through execution, and the only thing ever published is a three-way band that no one can divide back into a salary.
 
 ## Ten tests against the real Nox stack
 

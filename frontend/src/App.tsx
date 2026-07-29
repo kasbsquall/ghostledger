@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createPublicClient, createWalletClient, custom, http, isAddress } from 'viem';
+import { createPublicClient, createWalletClient, custom, fallback, http, isAddress } from 'viem';
 
 import { createViemHandleClient } from '@iexec-nox/handle';
 import {
@@ -27,6 +27,7 @@ import {
   DECIMALS,
   EXPLORER,
   POLICY,
+  RPC_ENDPOINTS,
   STATUS,
   formatUsd,
   readableError,
@@ -53,12 +54,17 @@ type Movement = {
   revealed: bigint | null;
 };
 
-// An explicit endpoint, because viem's default for Sepolia rate-limits under a
-// 15s poll and the dashboard then shows an error state that is about the RPC
-// rather than about the treasury.
+// Explicit endpoints with failover, because viem's default for Sepolia
+// rate-limits under a 15s poll and a single endpoint dying makes the dashboard
+// show an error that is about the RPC rather than about the treasury. The
+// fallback transport ranks the list and moves to the next on failure, so no
+// one viewer's rate limit takes the page down.
 const publicClient = createPublicClient({
   chain: CHAIN,
-  transport: http('https://ethereum-sepolia-rpc.publicnode.com', { retryCount: 3 }),
+  transport: fallback(
+    RPC_ENDPOINTS.map((url) => http(url, { retryCount: 2 })),
+    { rank: true }
+  ),
 });
 
 const SAFE_ABI = [
