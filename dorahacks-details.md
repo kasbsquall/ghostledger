@@ -60,6 +60,8 @@ The dashboard at **https://kasbsquall.github.io/ghostledger/** reads every row l
 
 You do not have to take any of that on trust. `bash scripts/verify-live.sh` reads Sepolia from your own machine with nothing but curl, no wallet and no Docker, and prints that the module is enabled on the real Safe and that each movement's published band matches the signatures the contract demanded. What it cannot print is any amount, because none is public. Every confidential-treasury tool next to this one hides the amount on screen and reveals it again at settlement, because a plaintext transfer carries its value in the clear. Here the payout moves as an ERC-7984 confidential token, so the figure stays hidden through execution, and the only thing ever published is a three-way band that no one can divide back into a salary.
 
+And it is not a constructor call sitting idle: the module has ten payouts proposed, nine bands settled by gateway proof, ten approvals and four executed through the real Safe. A confidential comparison did not only hide a number, it authorised real transfers on a live multisig, and the figure it judged stayed hidden through each one.
+
 ## Ten tests against the real Nox stack
 
 `npx hardhat test` boots the Nox offchain services in Docker, so encryption, the TEE runner and ACL enforcement are all real.

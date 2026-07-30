@@ -111,6 +111,26 @@ real Safe, that ten movements exist, and that each one's published band matches
 the exact number of signatures the contract demanded. What it cannot print is
 any amount, because none is public. That asymmetry is the product.
 
+### Real value has already moved under a confidential verdict
+
+The module's on-chain history is not a single constructor call. It has ten
+payouts proposed, nine risk bands settled by a gateway proof, ten owner
+approvals, and four payouts executed through the real Safe. Each execution
+released an ERC-7984 confidential token only after a confidential comparison
+had published a band and that band's quorum was met. The four executions, all
+succeeded:
+
+| Movement | Execution transaction |
+|---|---|
+| routine payout | [`0x26c86185…c79706`](https://eth-sepolia.blockscout.com/tx/0x26c861858504f3699197d0e4833dd37ab57810713f5ef2ba32641dc37ec79706) |
+| routine payout | [`0xa25be5f5…986125`](https://eth-sepolia.blockscout.com/tx/0xa25be5f5e1c483617e24c70e924cec5e40a2cb5ae6e82c97da78afedf7986125) |
+| routine payout | [`0xcaab783c…5403d9`](https://eth-sepolia.blockscout.com/tx/0xcaab783c2ebd7ef113fc342013a6a49a48d3a877fbd5ac464e47f7a1a55403d9) |
+| routine payout | [`0x0a9feb01…e3baea`](https://eth-sepolia.blockscout.com/tx/0x0a9feb0122b2154de60a849eae58d4e351e91aefc102980b4031c59ca0e3baea) |
+
+A confidential comparison here does not only hide a figure. It authorises real
+transfers on a live multisig, and the figure it judged stays hidden through the
+transfer.
+
 ### Known limits
 
 **The log's `owner` role can reconstruct executed amounts, and in this
